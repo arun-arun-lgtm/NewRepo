@@ -1286,8 +1286,8 @@
       });
 
       const total = filtered.length;
-      const FINDINGS_count = FINDINGS.length;
-      const filterNote = total < FINDINGS_count ? ' (filtered)' : '';
+      const findingsCount = FINDINGS.length;
+      const filterNote = total < findingsCount ? ' (filtered)' : '';
 
       document.getElementById('summary-stats').innerHTML =
         '<span class="stat-pill"><span class="count" style="font-weight:800;">' + total + '</span> finding' +
@@ -1298,7 +1298,7 @@
     /* Finding detail panel                                                 */
     /* ------------------------------------------------------------------ */
 
-    var openDetailId = null;
+    let openDetailId = null;
 
     function toggleDetail(id) {
       if (openDetailId === id) {
@@ -1485,7 +1485,7 @@
           hour: '2-digit', minute: '2-digit'
         });
 
-        var contentHtml = '';
+        let contentHtml = '';
         if (e.type === 'screenshot') {
           contentHtml = [
             '<div class="screenshot-placeholder" aria-label="Screenshot placeholder for: ' + escapeHtml(e.title) + '">',
@@ -1536,14 +1536,14 @@
       const summary = form.summary.value.trim();
 
       if (!title || !sev || !asset || !summary) {
-        var first = !title ? form.title : (!sev ? form.severity : (!asset ? form.asset : form.summary));
+        const first = !title ? form.title : (!sev ? form.severity : (!asset ? form.asset : form.summary));
         first.focus();
         first.style.borderColor = 'var(--danger)';
         setTimeout(function() { first.style.borderColor = ''; }, 2000);
         return;
       }
 
-      var newFinding = {
+      const newFinding = {
         id:             nextId(),
         title:          title,
         severity:       sev,
@@ -1562,7 +1562,7 @@
       FINDINGS.push(newFinding);
       form.reset();
 
-      var success = document.getElementById('form-success');
+      const success = document.getElementById('form-success');
       success.style.display = 'block';
       setTimeout(function() { success.style.display = 'none'; }, 5000);
 
