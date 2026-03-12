@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bug Bounty Reporting Workspace</title>
+  <style>
+    /* === Design tokens === */
+    :root {
+      color-scheme: light;
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-alt: #eef3fb;
+      --text: #18212f;
+      --muted: #5d6b82;
+      --border: #d9e2ef;
+      --primary: #2059d6;
+      --primary-soft: #e8f0ff;
+      --success: #157347;
+      --warning: #b86a00;
+      --danger: #b42318;
+      --shadow: 0 4px 24px rgba(24, 33, 47, 0.08);
+      --radius: 18px;
+      --nav-h: 56px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* === Navigation === */
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 4px;
+      overflow-x: auto;
+    }
+
+    .site-nav .brand {
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--primary);
+      white-space: nowrap;
+      margin-right: 16px;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus-visible {
+      background: var(--primary-soft);
+      color: var(--primary);
+      outline: 2px solid var(--primary);
+      outline-offset: 1px;
+    }
+
+    /* === Page shell === */
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    section { margin-bottom: 32px; }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-header h2 { margin: 0; }
+
+    /* === Hero === */
+    .hero {
+      background: radial-gradient(circle at top right, #dae7ff 0%, #eef4ff 28%, #ffffff 72%);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow, .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .eyebrow {
+      background: var(--primary-soft);
+      color: var(--primary);
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.05;
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 0 0 24px;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .hero-grid, .metrics, .two-column, .module-grid, .finding-grid, .timeline {
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero-grid { grid-template-columns: 2fr 1fr; align-items: start; }
+    .metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 24px; }
+
+    /* === Cards === */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .metric-value {
+      display: block;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .metric-label { font-size: 13px; }
+
+    .muted { color: var(--muted); }
+
+    .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .button:hover { opacity: 0.88; }
+    .button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+    .button-primary { background: var(--primary); color: #fff; }
+    .button-secondary { background: #fff; border-color: var(--border); color: var(--text); }
+    .button-sm { padding: 6px 12px; font-size: 13px; border-radius: 8px; }
+
+    h2, h3 { margin-top: 0; }
+
+    .two-column { grid-template-columns: 1.2fr 0.8fr; }
+    .module-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .module-card ul, .finding-grid ul, .timeline ul {
+      margin: 12px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .finding-grid { grid-template-columns: 1.1fr 0.9fr; }
+
+    /* === Tables === */
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    .table caption {
+      text-align: left;
+      font-weight: 700;
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    .table th, .table td {
+      text-align: left;
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table th {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      background: var(--surface-alt);
+    }
+
+    .table tbody tr:hover { background: #f8fafd; }
+
+    /* === Severity badges === */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .sev-critical { color: var(--danger); background: #fdecea; }
+    .sev-high     { color: #9a3412;        background: #fff1e8; }
+    .sev-medium   { color: var(--warning);  background: #fff7e6; }
+    .sev-low      { color: #065986;         background: #e0f2fe; }
+    .sev-info     { color: #344054;         background: #eef2f6; }
+
+    /* Legacy aliases (PR #3 compatibility) */
+    .critical { color: var(--danger); background: #fdecea; }
+    .high     { color: #9a3412;       background: #fff1e8; }
+    .medium   { color: var(--warning); background: #fff7e6; }
+    .new      { color: var(--primary); background: var(--primary-soft); }
+
+    /* === Workflow status badges === */
+    .status-draft     { color: #344054; background: #eef2f6; }
+    .status-triaged   { color: #3730a3; background: #eef2ff; }
+    .status-confirmed { color: #92400e; background: #fffbeb; }
+    .status-fixed     { color: #027a48; background: #ecfdf3; }
+    .status-retest    { color: #6941c6; background: #f5f0ff; }
+    .status-closed    { color: #1c1c1e; background: #e5e7eb; }
+
+    /* === Filter bar === */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+    }
+
+    .filter-bar label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .filter-bar select {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .filter-bar select:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+    .filter-separator { flex: 1; }
+
+    /* === Summary stats strip === */
+    .summary-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .stat-pill .count {
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    /* === Forms === */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full-width { grid-column: 1 / -1; }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .form-label .required {
+      color: var(--danger);
+      margin-left: 2px;
+    }
+
+    .form-control {
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(32, 89, 214, 0.12);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 90px;
+      line-height: 1.5;
+    }
+
+    .form-hint { font-size: 12px; color: var(--muted); }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .form-success {
+      display: none;
+      background: #ecfdf3;
+      border: 1px solid #a7f3d0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: #027a48;
+      font-weight: 600;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    /* === Evidence === */
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .evidence-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .evidence-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .evidence-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+
+    .type-screenshot   { background: #f5f0ff; color: #6941c6; }
+    .type-req-response { background: #e0f2fe; color: #065986; }
+    .type-note         { background: #fff7e6; color: #92400e; }
+
+    .evidence-title { font-weight: 700; font-size: 14px; margin: 0 0 4px; }
+    .evidence-meta  { font-size: 12px; color: var(--muted); margin: 0 0 10px; }
+
+    .screenshot-placeholder {
+      background: linear-gradient(135deg, #f0f4ff 0%, #e8eef8 100%);
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .screenshot-placeholder svg { opacity: 0.4; }
+
+    .code-block {
+      background: #1e2433;
+      color: #cdd9ea;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: "SFMono-Regular", "Consolas", "Liberation Mono", Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre;
+      margin: 0;
+    }
+
+    .evidence-finding-ref {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--primary);
+      background: var(--primary-soft);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    /* === Detail panel === */
+    .finding-detail {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-top: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .finding-detail.open { display: block; }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .detail-field label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .detail-field p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .detail-field.full { grid-column: 1 / -1; }
+
+    .detail-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      color: var(--muted);
+      line-height: 1;
+      padding: 0;
+    }
+
+    .detail-close:hover { color: var(--text); }
+
+    /* === Report section === */
+    .report-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 16px;
+    }
+
+    .progress {
+      width: 100%;
+      height: 10px;
+      margin-top: 8px;
+      appearance: none;
+      border: none;
+      background: transparent;
+    }
+
+    .progress::-webkit-progress-bar {
+      background: #e8eef8;
+      border-radius: 999px;
+    }
+
+    .progress::-webkit-progress-value {
+      background: linear-gradient(90deg, #2f6fed 0%, #63a0ff 100%);
+      border-radius: 999px;
+    }
+
+    .progress::-moz-progress-bar {
+      background: linear-gradient(90deg, #2f6fed 0%, #63a0ff 100%);
+      border-radius: 999px;
+    }
+
+    /* === Workflow legend === */
+    .workflow-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 14px;
+      background: var(--surface-alt);
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .workflow-step {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .workflow-step::after {
+      content: "→";
+      color: var(--border);
+    }
+
+    .workflow-step:last-child::after { content: ""; }
+
+    /* === Timeline === */
+    .timeline { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .timeline .card { min-height: 160px; }
+
+    /* === Footer === */
+    footer {
+      padding: 12px 4px 28px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    /* === Responsive === */
+    @media (max-width: 900px) {
+      .hero-grid, .two-column, .module-grid, .finding-grid,
+      .timeline, .metrics, .report-grid, .evidence-grid,
+      .form-grid, .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 560px) {
+      .metrics { grid-template-columns: 1fr; }
+      .page { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== Navigation ===== -->
+  <nav class="site-nav" aria-label="Site navigation">
+    <span class="brand">🔍 BBR Workspace</span>
+    <a class="nav-link" href="#dashboard">Dashboard</a>
+    <a class="nav-link" href="#findings">Findings</a>
+    <a class="nav-link" href="#new-finding">Submit Finding</a>
+    <a class="nav-link" href="#evidence">Evidence</a>
+    <a class="nav-link" href="#report">Report</a>
+    <a class="nav-link" href="#delivery-plan">Roadmap</a>
+  </nav>
+
+  <div class="page">
+
+    <!-- ===== Hero ===== -->
+    <header class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Authorized security reporting framework</div>
+          <h1>Bug bounty reporting workspace</h1>
+          <p>
+            A structured, workflow-driven framework for authorized bug bounty reporting.
+            Capture findings, attach evidence, manage lifecycle states, and generate
+            remediation-focused reports — all in a single dependency-free workspace.
+          </p>
+          <div class="cta-row">
+            <a class="button button-primary" href="#findings">View findings</a>
+            <a class="button button-secondary" href="#new-finding">Submit finding</a>
+            <a class="button button-secondary" href="#report">Report preview</a>
+          </div>
+          <span class="muted">Dependency-free static implementation. Mock data drives the UI; swap in a real API when ready.</span>
+        </div>
+        <aside class="card">
+          <h2>Engagement at a glance</h2>
+          <p class="muted">Acme Web App Validation — Acme Internal Bug Bounty</p>
+          <ul>
+            <li>In-scope: <strong>app.acme.test, api.acme.test</strong></li>
+            <li>Rules: Safe validation only. No destructive testing.</li>
+            <li>Status: <span class="badge new">Active assessment</span></li>
+          </ul>
+          <hr style="border:none;border-top:1px solid var(--border);margin:14px 0;">
+          <p class="muted" style="font-size:13px;margin:0;">
+            Only authorized engagements. Evidence protected, secrets redacted,
+            remediation guidance is the primary output.
+          </p>
+        </aside>
+      </div>
+      <div class="metrics">
+        <div class="card">
+          <span class="metric-value" id="metric-total">6</span>
+          <span class="muted metric-label">Total findings</span>
+        </div>
+        <div class="card">
+          <span class="metric-value" id="metric-open">4</span>
+          <span class="muted metric-label">Open / active</span>
+        </div>
+        <div class="card">
+          <span class="metric-value" id="metric-critical">1</span>
+          <span class="muted metric-label">Critical severity</span>
+        </div>
+        <div class="card">
+          <span class="metric-value" id="metric-fixed">1</span>
+          <span class="muted metric-label">Fixed / closed</span>
+        </div>
+      </div>
+    </header>
+
+    <main id="workspace">
+
+      <!-- ===== Dashboard ===== -->
+      <section id="dashboard">
+        <div class="section-header">
+          <h2>Project dashboard</h2>
+        </div>
+        <div class="two-column">
+          <article class="card">
+            <p class="muted" style="margin-top:0;">Track scope, rules of engagement, and project context for the active testing engagement.</p>
+            <table class="table" aria-label="Project summary">
+              <caption>Project summary</caption>
+              <tbody>
+                <tr><th scope="row">Project</th><td>Acme Web App Validation</td></tr>
+                <tr><th scope="row">Client / Program</th><td>Acme Internal Bug Bounty</td></tr>
+                <tr><th scope="row">In-scope assets</th><td>app.acme.test, api.acme.test</td></tr>
+                <tr><th scope="row">Out-of-scope</th><td>Production infrastructure, third-party vendors</td></tr>
+                <tr><th scope="row">Rules of engagement</th><td>Safe validation only. No destructive testing.</td></tr>
+                <tr><th scope="row">Status</th><td><span class="badge new">Active assessment</span></td></tr>
+              </tbody>
+            </table>
+          </article>
+          <aside class="card">
+            <h3>MVP modules</h3>
+            <ul style="padding-left:18px;line-height:1.8;color:var(--muted);">
+              <li><strong>Findings manager</strong> — structured capture with severity, CWE, lifecycle</li>
+              <li><strong>Evidence library</strong> — screenshots, request/response, PoC notes</li>
+              <li><strong>Workflow engine</strong> — Draft → Triaged → Confirmed → Fixed → Retest → Closed</li>
+              <li><strong>Report generator</strong> — executive summary, finding details, remediation status</li>
+              <li><strong>Remediation tracker</strong> — progress per finding, overall metrics</li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ===== Findings ===== -->
+      <section id="findings">
+        <div class="section-header">
+          <h2>Findings</h2>
+          <a class="button button-primary button-sm" href="#new-finding">+ Submit finding</a>
+        </div>
+
+        <!-- Workflow state legend -->
+        <div class="workflow-legend" role="note" aria-label="Workflow states">
+          <div class="workflow-step"><span class="badge status-draft">Draft</span></div>
+          <div class="workflow-step"><span class="badge status-triaged">Triaged</span></div>
+          <div class="workflow-step"><span class="badge status-confirmed">Confirmed</span></div>
+          <div class="workflow-step"><span class="badge status-fixed">Fixed</span></div>
+          <div class="workflow-step"><span class="badge status-retest">Retest</span></div>
+          <div class="workflow-step"><span class="badge status-closed">Closed</span></div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar" role="search" aria-label="Filter findings">
+          <label for="filter-severity">Severity</label>
+          <select id="filter-severity" onchange="applyFilters()" aria-label="Filter by severity">
+            <option value="all">All severities</option>
+            <option value="critical">Critical</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+            <option value="info">Informational</option>
+          </select>
+          <label for="filter-status">Status</label>
+          <select id="filter-status" onchange="applyFilters()" aria-label="Filter by status">
+            <option value="all">All statuses</option>
+            <option value="draft">Draft</option>
+            <option value="triaged">Triaged</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="fixed">Fixed</option>
+            <option value="retest">Retest</option>
+            <option value="closed">Closed</option>
+          </select>
+          <span class="filter-separator"></span>
+          <button class="button button-secondary button-sm" onclick="resetFilters()">Clear filters</button>
+        </div>
+
+        <!-- Summary stats (rendered by JS) -->
+        <div class="summary-stats" id="summary-stats" aria-live="polite"></div>
+
+        <!-- Findings table (rendered by JS) -->
+        <div class="card" style="padding:0;overflow:hidden;">
+          <table class="table" id="findings-table" aria-label="Findings list">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Finding</th>
+                <th scope="col">Severity</th>
+                <th scope="col">Asset</th>
+                <th scope="col">CWE</th>
+                <th scope="col">Status</th>
+                <th scope="col">Updated</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="findings-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- Finding detail panel (expanded on row click) -->
+        <div class="finding-detail" id="finding-detail" role="region" aria-label="Finding detail"></div>
+      </section>
+
+      <!-- ===== Submit Finding Form ===== -->
+      <section id="new-finding">
+        <div class="section-header">
+          <h2>Submit finding</h2>
+        </div>
+        <article class="card">
+          <p class="muted" style="margin-top:0;">
+            Complete all required fields (<span aria-hidden="true" style="color:var(--danger)">*</span> required).
+            Findings are added to the list above and can be reviewed, updated, and tracked through the full lifecycle.
+          </p>
+          <form id="finding-form" onsubmit="handleFormSubmit(event)" novalidate aria-label="Finding submission form">
+            <div class="form-grid">
+
+              <div class="form-group">
+                <label class="form-label" for="f-title">Finding title <span class="required" aria-label="required">*</span></label>
+                <input class="form-control" type="text" id="f-title" name="title"
+                  placeholder="e.g. Reflected XSS in search parameter" required
+                  autocomplete="off">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="f-asset">Target asset <span class="required" aria-label="required">*</span></label>
+                <input class="form-control" type="text" id="f-asset" name="asset"
+                  placeholder="e.g. app.acme.test/search" required
+                  autocomplete="off">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="f-severity">Severity <span class="required" aria-label="required">*</span></label>
+                <select class="form-control" id="f-severity" name="severity" required>
+                  <option value="">Select severity…</option>
+                  <option value="critical">Critical</option>
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                  <option value="info">Informational</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="f-status">Status</label>
+                <select class="form-control" id="f-status" name="status">
+                  <option value="draft">Draft</option>
+                  <option value="triaged">Triaged</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="fixed">Fixed</option>
+                  <option value="retest">Retest</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="f-cwe">CWE / Taxonomy</label>
+                <input class="form-control" type="text" id="f-cwe" name="cwe"
+                  placeholder="e.g. CWE-79, CWE-285, OWASP A03"
+                  autocomplete="off">
+                <span class="form-hint">Common Weakness Enumeration ID or applicable taxonomy reference.</span>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="f-cvss">CVSS score (optional)</label>
+                <input class="form-control" type="text" id="f-cvss" name="cvss"
+                  placeholder="e.g. 8.8 (CVSS:3.1/AV:N/AC:L/…)"
+                  autocomplete="off">
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label" for="f-summary">Summary / description <span class="required" aria-label="required">*</span></label>
+                <textarea class="form-control" id="f-summary" name="summary" rows="3"
+                  placeholder="Describe the vulnerability: what it is, where it exists, and the potential impact." required></textarea>
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label" for="f-repro">Reproduction steps</label>
+                <textarea class="form-control" id="f-repro" name="reproSteps" rows="4"
+                  placeholder="1. Navigate to…&#10;2. Enter payload…&#10;3. Observe…"></textarea>
+                <span class="form-hint">Safe, minimal steps sufficient to reproduce without causing harm.</span>
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label" for="f-recommendation">Remediation recommendation</label>
+                <textarea class="form-control" id="f-recommendation" name="recommendation" rows="3"
+                  placeholder="Describe the recommended fix or mitigation strategy."></textarea>
+              </div>
+
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="button button-primary">Save finding</button>
+              <button type="button" class="button button-secondary" onclick="resetForm()">Reset form</button>
+            </div>
+
+            <div class="form-success" id="form-success" role="status" aria-live="polite">
+              ✓ Finding saved successfully. <a href="#findings" style="color:inherit;text-decoration:underline;">View in findings list →</a>
+            </div>
+          </form>
+        </article>
+      </section>
+
+      <!-- ===== Evidence Library ===== -->
+      <section id="evidence">
+        <div class="section-header">
+          <h2>Evidence library</h2>
+        </div>
+        <p class="muted" style="margin-top:0;margin-bottom:16px;">
+          Evidence items are linked to findings by ID. Each item captures the type, metadata, and proof-of-concept
+          content required for a complete finding record.
+        </p>
+        <div class="evidence-grid" id="evidence-grid">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- ===== Report preview ===== -->
+      <section id="report">
+        <div class="section-header">
+          <h2>Report preview</h2>
+          <button class="button button-secondary button-sm" onclick="window.print()">Print / export</button>
+        </div>
+        <div class="report-grid">
+          <article class="card">
+            <h3>Executive summary</h3>
+            <p id="report-summary" class="muted"></p>
+            <h3 style="margin-top:20px;">Findings by severity</h3>
+            <table class="table" aria-label="Findings by severity" id="report-sev-table">
+              <thead>
+                <tr>
+                  <th scope="col">Severity</th>
+                  <th scope="col">Count</th>
+                  <th scope="col">Open</th>
+                  <th scope="col">Fixed / Closed</th>
+                </tr>
+              </thead>
+              <tbody id="report-sev-tbody"></tbody>
+            </table>
+          </article>
+          <aside class="card">
+            <h3>Remediation progress</h3>
+            <div id="remediation-progress-block">
+              <!-- Rendered by JS -->
+            </div>
+            <h3 style="margin-top:20px;">Workflow distribution</h3>
+            <div id="workflow-distribution">
+              <!-- Rendered by JS -->
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ===== Delivery plan ===== -->
+      <section id="delivery-plan">
+        <div class="section-header">
+          <h2>Delivery plan</h2>
+        </div>
+        <div class="timeline">
+          <article class="card">
+            <h3>Week 1</h3>
+            <ul>
+              <li>Define scope and stack</li>
+              <li>Design database schema</li>
+              <li>Sketch dashboard and reporting flows</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Week 2</h3>
+            <ul>
+              <li>Add authentication</li>
+              <li>Build project dashboard</li>
+              <li>Create findings list and form</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Week 3</h3>
+            <ul>
+              <li>Support evidence uploads</li>
+              <li>Add report template</li>
+              <li>Generate HTML export</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Week 4</h3>
+            <ul>
+              <li>Add remediation tracker</li>
+              <li>Polish UI and accessibility</li>
+              <li>Test end-to-end report flow</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      Bug bounty reporting workspace — authorized assessments only. Evidence protected. Remediation guidance is the primary output.
+    </footer>
+  </div>
+
+  <!-- ===== JavaScript: data store and interactive behaviour ===== -->
+  <script>
+    'use strict';
+
+    /* ------------------------------------------------------------------ */
+    /* Mock data store                                                       */
+    /* In a future iteration, replace with fetch() calls to a real API.    */
+    /* ------------------------------------------------------------------ */
+
+    const FINDINGS = [
+      {
+        id: 'F-001',
+        title: 'Stored XSS in profile note renderer',
+        severity: 'critical',
+        status: 'triaged',
+        asset: 'app.acme.test/profile',
+        cwe: 'CWE-79',
+        cvss: '8.8',
+        summary: 'User-controlled input in the profile notes field is rendered as HTML without sanitization, allowing persistent cross-site scripting attacks against any user who views the affected profile.',
+        reproSteps: '1. Log in as any authenticated user.\n2. Navigate to Profile › Notes.\n3. Enter payload: <img src=x onerror=alert(document.cookie)>\n4. Save and reload the page.\n5. Observe the script executes in the viewer\'s session context.',
+        recommendation: 'Apply output encoding using a trusted HTML sanitization library (e.g. DOMPurify). Enforce a strict Content Security Policy header that blocks inline script execution.',
+        createdAt: '2026-03-01',
+        updatedAt: '2026-03-10',
+        evidenceIds: ['E-001', 'E-002']
+      },
+      {
+        id: 'F-002',
+        title: 'Broken access control on report export',
+        severity: 'high',
+        status: 'confirmed',
+        asset: 'api.acme.test/reports/export',
+        cwe: 'CWE-285',
+        cvss: '7.5',
+        summary: 'The report export endpoint does not verify that the requesting user is authorized to access the target report. Any authenticated user can export any report by manipulating the report ID parameter.',
+        reproSteps: '1. Authenticate as User A and create a private report. Note its ID.\n2. Authenticate as User B.\n3. Request GET /api/reports/{id}/export using User A\'s report ID.\n4. Observe User B receives User A\'s report without authorization.',
+        recommendation: 'Implement server-side object-level authorization on the export endpoint. Verify the requesting user owns or holds explicit permission for the requested report before returning data.',
+        createdAt: '2026-03-02',
+        updatedAt: '2026-03-09',
+        evidenceIds: ['E-003']
+      },
+      {
+        id: 'F-003',
+        title: 'Missing rate limiting on login endpoint',
+        severity: 'medium',
+        status: 'fixed',
+        asset: 'app.acme.test/login',
+        cwe: 'CWE-307',
+        cvss: '5.3',
+        summary: 'The authentication endpoint accepts unlimited login attempts with no rate limiting, account lockout, or CAPTCHA mechanism, enabling brute force attacks against user credentials.',
+        reproSteps: '1. Send 500 POST requests to /login with varying password values using an automated tool.\n2. Observe no rate-limit or lockout response is returned for any request.',
+        recommendation: 'Implement progressive delays and account lockout after a threshold of failed attempts. Add rate limiting at the API gateway. Consider TOTP-based multi-factor authentication.',
+        createdAt: '2026-03-03',
+        updatedAt: '2026-03-11',
+        evidenceIds: ['E-004']
+      },
+      {
+        id: 'F-004',
+        title: 'IDOR on user profile settings endpoint',
+        severity: 'high',
+        status: 'retest',
+        asset: 'api.acme.test/users/{id}/settings',
+        cwe: 'CWE-639',
+        cvss: '7.1',
+        summary: 'The user settings endpoint allows modification of any user\'s settings by changing the user ID in the URL path. Authorization is checked only against authentication, not resource ownership.',
+        reproSteps: '1. Authenticate as User A (ID: 101).\n2. Send PATCH /api/users/102/settings {"email_notifications": false}.\n3. Observe settings for User B (ID: 102) are updated without error.',
+        recommendation: 'Enforce object-level authorization on every endpoint. Verify the authenticated user\'s identity matches the resource owner, or that an explicit permission grant exists.',
+        createdAt: '2026-03-04',
+        updatedAt: '2026-03-12',
+        evidenceIds: ['E-005']
+      },
+      {
+        id: 'F-005',
+        title: 'Sensitive data exposed in error messages',
+        severity: 'low',
+        status: 'closed',
+        asset: 'api.acme.test',
+        cwe: 'CWE-209',
+        cvss: '3.1',
+        summary: 'Unhandled exceptions expose internal stack traces, database query fragments, and configuration values in API error responses, providing significant reconnaissance information.',
+        reproSteps: '1. Send a malformed request to any API endpoint.\n2. Observe the 500 response includes a full stack trace and internal file paths.',
+        recommendation: 'Configure production error handlers to return only generic error messages. Log full error details server-side only. Implement a global exception handler.',
+        createdAt: '2026-03-01',
+        updatedAt: '2026-03-08',
+        evidenceIds: []
+      },
+      {
+        id: 'F-006',
+        title: 'Missing HTTPS enforcement on admin panel',
+        severity: 'medium',
+        status: 'draft',
+        asset: 'app.acme.test/admin',
+        cwe: 'CWE-319',
+        cvss: '5.9',
+        summary: 'The administrative panel is accessible over plain HTTP in addition to HTTPS. Session tokens transmitted over HTTP are vulnerable to interception via passive network sniffing.',
+        reproSteps: '1. Navigate to http://app.acme.test/admin.\n2. Observe the admin panel loads without redirect to HTTPS.\n3. Capture network traffic to observe session tokens in cleartext.',
+        recommendation: 'Enforce HTTPS across all endpoints using HSTS with a long max-age. Configure automatic HTTP-to-HTTPS redirects. Set the Secure flag on all session cookies.',
+        createdAt: '2026-03-05',
+        updatedAt: '2026-03-05',
+        evidenceIds: []
+      }
+    ];
+
+    const EVIDENCE = [
+      {
+        id: 'E-001',
+        findingId: 'F-001',
+        type: 'screenshot',
+        title: 'XSS payload execution — browser alert in victim session',
+        description: 'Browser alert dialog triggered by the stored XSS payload, demonstrating script execution in the victim\'s authenticated session context.',
+        timestamp: '2026-03-01T14:22:00Z',
+        notes: 'Captured in Firefox 124 on test instance. Payload used: <img src=x onerror=alert(document.cookie)>'
+      },
+      {
+        id: 'E-002',
+        findingId: 'F-001',
+        type: 'request-response',
+        title: 'Profile notes save — unsanitized payload stored and reflected',
+        description: 'HTTP request and response confirming the payload is stored without sanitization and reflected without output encoding.',
+        timestamp: '2026-03-01T14:25:00Z',
+        notes: 'POST /api/profile/notes HTTP/1.1\nContent-Type: application/json\n\n{"notes": "<img src=x onerror=alert(1)>"}\n\n---\n\nHTTP/1.1 200 OK\nContent-Type: application/json\n\n{"status":"saved","notes":"<img src=x onerror=alert(1)>"}'
+      },
+      {
+        id: 'E-003',
+        findingId: 'F-002',
+        type: 'request-response',
+        title: 'Unauthorized report export — cross-account IDOR',
+        description: 'Request showing User B accessing User A\'s private report via direct object reference manipulation on the export endpoint.',
+        timestamp: '2026-03-02T10:15:00Z',
+        notes: 'GET /api/reports/acme-report-007/export HTTP/1.1\nAuthorization: Bearer <User B token>\n\n---\n\nHTTP/1.1 200 OK\nContent-Type: application/pdf\nContent-Length: 48291\n\n[Full report content belonging to User A returned]'
+      },
+      {
+        id: 'E-004',
+        findingId: 'F-003',
+        type: 'note',
+        title: 'Rate limit test — 500 requests, 0 throttled',
+        description: 'Automated test confirming no rate limiting is applied. All 500 requests processed without throttling, lockout, or CAPTCHA challenge.',
+        timestamp: '2026-03-03T09:00:00Z',
+        notes: 'Tool: custom script (safe test credentials)\nTotal requests: 500\nDuration: 58.3 seconds\nSuccessful logins (correct credentials): 1\nRejected (wrong credentials): 499\nRate-limited responses (HTTP 429): 0\nAccount lockout triggered: No'
+      },
+      {
+        id: 'E-005',
+        findingId: 'F-004',
+        type: 'request-response',
+        title: 'IDOR — cross-account settings modification',
+        description: 'Request and response confirming successful modification of another user\'s settings without explicit authorization.',
+        timestamp: '2026-03-04T11:30:00Z',
+        notes: 'PATCH /api/users/102/settings HTTP/1.1\nAuthorization: Bearer <User A (ID 101) token>\nContent-Type: application/json\n\n{"email_notifications": false}\n\n---\n\nHTTP/1.1 200 OK\nContent-Type: application/json\n\n{"status":"updated","userId":102}'
+      }
+    ];
+
+    /* ------------------------------------------------------------------ */
+    /* Utilities                                                            */
+    /* ------------------------------------------------------------------ */
+
+    function severityBadge(sev) {
+      const map = {
+        critical: ['sev-critical', 'Critical'],
+        high:     ['sev-high',     'High'],
+        medium:   ['sev-medium',   'Medium'],
+        low:      ['sev-low',      'Low'],
+        info:     ['sev-info',     'Informational']
+      };
+      const [cls, label] = map[sev] || ['sev-info', sev];
+      return `<span class="badge ${cls}">${label}</span>`;
+    }
+
+    function statusBadge(status) {
+      const map = {
+        draft:     'status-draft',
+        triaged:   'status-triaged',
+        confirmed: 'status-confirmed',
+        fixed:     'status-fixed',
+        retest:    'status-retest',
+        closed:    'status-closed'
+      };
+      const cls = map[status] || 'status-draft';
+      const label = status.charAt(0).toUpperCase() + status.slice(1);
+      return `<span class="badge ${cls}">${label}</span>`;
+    }
+
+    function evidenceTypeBadge(type) {
+      const map = {
+        'screenshot':      ['type-screenshot',   '📷 Screenshot'],
+        'request-response':['type-req-response',  '🔁 Req / Resp'],
+        'note':            ['type-note',          '📝 Note']
+      };
+      const [cls, label] = map[type] || ['type-note', type];
+      return `<span class="evidence-type-badge ${cls}">${label}</span>`;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function nextId() {
+      const ids = FINDINGS.map(f => parseInt(f.id.replace('F-', ''), 10));
+      return 'F-' + String(Math.max(0, ...ids) + 1).padStart(3, '0');
+    }
+
+    function today() {
+      return new Date().toISOString().split('T')[0];
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Findings rendering                                                   */
+    /* ------------------------------------------------------------------ */
+
+    function getFilters() {
+      return {
+        severity: document.getElementById('filter-severity').value,
+        status:   document.getElementById('filter-status').value
+      };
+    }
+
+    function applyFilters() {
+      const { severity, status } = getFilters();
+      renderFindings(severity, status);
+    }
+
+    function resetFilters() {
+      document.getElementById('filter-severity').value = 'all';
+      document.getElementById('filter-status').value   = 'all';
+      applyFilters();
+    }
+
+    function renderFindings(sevFilter, statusFilter) {
+      sevFilter    = sevFilter    || 'all';
+      statusFilter = statusFilter || 'all';
+
+      const filtered = FINDINGS.filter(function(f) {
+        if (sevFilter !== 'all' && f.severity !== sevFilter) return false;
+        if (statusFilter !== 'all' && f.status !== statusFilter) return false;
+        return true;
+      });
+
+      const tbody = document.getElementById('findings-tbody');
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted);">No findings match the current filter.</td></tr>';
+        renderSummaryStats(filtered);
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(function(f) {
+        const statuses = ['draft','triaged','confirmed','fixed','retest','closed'];
+        const opts = statuses.map(function(s) {
+          return '<option value="' + s + '"' + (f.status === s ? ' selected' : '') + '>' +
+            s.charAt(0).toUpperCase() + s.slice(1) + '</option>';
+        }).join('');
+
+        return [
+          '<tr>',
+          '<td><code style="font-size:12px;">' + escapeHtml(f.id) + '</code></td>',
+          '<td><button class="detail-trigger" onclick="toggleDetail(\'' + f.id + '\')" ',
+          'style="background:none;border:none;cursor:pointer;text-align:left;font-size:14px;',
+          'font-weight:600;color:var(--primary);padding:0;" aria-expanded="false" ',
+          'aria-controls="finding-detail">',
+          escapeHtml(f.title) + '</button></td>',
+          '<td>' + severityBadge(f.severity) + '</td>',
+          '<td style="font-size:13px;">' + escapeHtml(f.asset) + '</td>',
+          '<td><code style="font-size:12px;">' + escapeHtml(f.cwe || '—') + '</code></td>',
+          '<td>',
+          '<select class="form-control" style="padding:4px 8px;font-size:12px;" ',
+          'aria-label="Update status for ' + escapeHtml(f.title) + '" ',
+          'onchange="updateStatus(\'' + f.id + '\', this.value)">',
+          opts,
+          '</select>',
+          '</td>',
+          '<td style="font-size:12px;color:var(--muted);">' + escapeHtml(f.updatedAt) + '</td>',
+          '<td>' + statusBadge(f.status) + '</td>',
+          '</tr>'
+        ].join('');
+      }).join('');
+
+      renderSummaryStats(filtered);
+      updateMetrics();
+      updateReport();
+    }
+
+    function renderSummaryStats(filtered) {
+      const counts = { critical:0, high:0, medium:0, low:0, info:0 };
+      filtered.forEach(function(f) { if (counts[f.severity] !== undefined) counts[f.severity]++; });
+
+      const pills = [
+        ['critical', 'sev-critical'],
+        ['high', 'sev-high'],
+        ['medium', 'sev-medium'],
+        ['low', 'sev-low'],
+        ['info', 'sev-info']
+      ].filter(function(p) { return counts[p[0]] > 0; }).map(function(p) {
+        return '<span class="stat-pill"><span class="count badge ' + p[1] + '">' +
+          counts[p[0]] + '</span> ' +
+          p[0].charAt(0).toUpperCase() + p[0].slice(1) + '</span>';
+      });
+
+      const total = filtered.length;
+      const FINDINGS_count = FINDINGS.length;
+      const filterNote = total < FINDINGS_count ? ' (filtered)' : '';
+
+      document.getElementById('summary-stats').innerHTML =
+        '<span class="stat-pill"><span class="count" style="font-weight:800;">' + total + '</span> finding' +
+        (total !== 1 ? 's' : '') + filterNote + '</span>' + pills.join('');
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Finding detail panel                                                 */
+    /* ------------------------------------------------------------------ */
+
+    var openDetailId = null;
+
+    function toggleDetail(id) {
+      if (openDetailId === id) {
+        closeDetail();
+        return;
+      }
+      openDetailId = id;
+      const f = FINDINGS.find(function(x) { return x.id === id; });
+      if (!f) return;
+
+      const ev = EVIDENCE.filter(function(e) { return e.findingId === id; });
+      const evHtml = ev.length ? ev.map(function(e) {
+        return '<span class="evidence-finding-ref">↗ ' + escapeHtml(e.id) + ': ' + escapeHtml(e.title) + '</span> ';
+      }).join('') : '<span class="muted" style="font-size:13px;">No evidence items linked.</span>';
+
+      const panel = document.getElementById('finding-detail');
+      panel.innerHTML = [
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">',
+        '<div>',
+        '<h3 style="margin:0 0 6px;">' + escapeHtml(f.title) + '</h3>',
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">',
+        severityBadge(f.severity), statusBadge(f.status),
+        f.cwe ? '<code style="font-size:12px;background:#eef2f6;padding:3px 8px;border-radius:6px;">' + escapeHtml(f.cwe) + '</code>' : '',
+        f.cvss ? '<span class="badge" style="background:#eef2f6;color:#344054;">CVSS ' + escapeHtml(f.cvss) + '</span>' : '',
+        '</div>',
+        '</div>',
+        '<button class="detail-close" onclick="closeDetail()" aria-label="Close detail panel">×</button>',
+        '</div>',
+
+        '<div class="detail-grid">',
+
+        '<div class="detail-field full">',
+        '<label>Summary</label>',
+        '<p>' + escapeHtml(f.summary) + '</p>',
+        '</div>',
+
+        '<div class="detail-field">',
+        '<label>Target asset</label>',
+        '<p><code style="font-size:13px;">' + escapeHtml(f.asset) + '</code></p>',
+        '</div>',
+
+        '<div class="detail-field">',
+        '<label>Dates</label>',
+        '<p style="font-size:13px;">Created: ' + escapeHtml(f.createdAt) + ' · Updated: ' + escapeHtml(f.updatedAt) + '</p>',
+        '</div>',
+
+        f.reproSteps ? [
+          '<div class="detail-field full">',
+          '<label>Reproduction steps</label>',
+          '<pre style="margin:0;white-space:pre-wrap;font-size:13px;line-height:1.6;background:var(--surface-alt);border-radius:8px;padding:12px;">',
+          escapeHtml(f.reproSteps),
+          '</pre>',
+          '</div>'
+        ].join('') : '',
+
+        f.recommendation ? [
+          '<div class="detail-field full">',
+          '<label>Remediation recommendation</label>',
+          '<p style="font-size:14px;line-height:1.6;">' + escapeHtml(f.recommendation) + '</p>',
+          '</div>'
+        ].join('') : '',
+
+        '<div class="detail-field full">',
+        '<label>Linked evidence</label>',
+        '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">' + evHtml + '</div>',
+        '</div>',
+
+        '</div>'
+      ].join('');
+
+      panel.classList.add('open');
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function closeDetail() {
+      openDetailId = null;
+      const panel = document.getElementById('finding-detail');
+      panel.classList.remove('open');
+      panel.innerHTML = '';
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Status transitions                                                   */
+    /* ------------------------------------------------------------------ */
+
+    function updateStatus(id, newStatus) {
+      const finding = FINDINGS.find(function(f) { return f.id === id; });
+      if (!finding) return;
+      finding.status = newStatus;
+      finding.updatedAt = today();
+      const { severity, status } = getFilters();
+      renderFindings(severity, status);
+      if (openDetailId === id) toggleDetail(id);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Metrics                                                              */
+    /* ------------------------------------------------------------------ */
+
+    function updateMetrics() {
+      const total    = FINDINGS.length;
+      const critical = FINDINGS.filter(function(f) { return f.severity === 'critical'; }).length;
+      const open     = FINDINGS.filter(function(f) { return !['fixed','closed'].includes(f.status); }).length;
+      const resolved = FINDINGS.filter(function(f) { return ['fixed','closed'].includes(f.status); }).length;
+
+      document.getElementById('metric-total').textContent    = total;
+      document.getElementById('metric-critical').textContent = critical;
+      document.getElementById('metric-open').textContent     = open;
+      document.getElementById('metric-fixed').textContent    = resolved;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Report section                                                       */
+    /* ------------------------------------------------------------------ */
+
+    function updateReport() {
+      const total    = FINDINGS.length;
+      const critical = FINDINGS.filter(function(f) { return f.severity === 'critical'; }).length;
+      const high     = FINDINGS.filter(function(f) { return f.severity === 'high'; }).length;
+      const fixed    = FINDINGS.filter(function(f) { return f.status === 'fixed'; }).length;
+      const closed   = FINDINGS.filter(function(f) { return f.status === 'closed'; }).length;
+      const resolved = fixed + closed;
+      const pct      = total ? Math.round((resolved / total) * 100) : 0;
+
+      /* Executive summary text */
+      const critText = critical > 0 ? (critical + ' critical issue' + (critical > 1 ? 's' : '') + ' requiring immediate attention') : 'no critical issues';
+      document.getElementById('report-summary').textContent =
+        total + ' findings recorded across the active engagement. ' +
+        'Severity breakdown: ' + critical + ' critical, ' + high + ' high. ' +
+        'Current remediation rate: ' + pct + '% (' + resolved + ' of ' + total + ' resolved). ' +
+        'Priority action: address ' + critText + '.';
+
+      /* Severity table */
+      const sevRows = [
+        ['critical', 'Critical'],
+        ['high',     'High'],
+        ['medium',   'Medium'],
+        ['low',      'Low'],
+        ['info',     'Informational']
+      ].map(function(pair) {
+        const all    = FINDINGS.filter(function(f) { return f.severity === pair[0]; });
+        if (!all.length) return '';
+        const openN  = all.filter(function(f) { return !['fixed','closed'].includes(f.status); }).length;
+        const resN   = all.length - openN;
+        return '<tr><td>' + severityBadge(pair[0]) + '</td>' +
+          '<td>' + all.length + '</td>' +
+          '<td>' + openN + '</td>' +
+          '<td>' + resN + '</td></tr>';
+      }).join('');
+      document.getElementById('report-sev-tbody').innerHTML = sevRows || '<tr><td colspan="4" class="muted">No findings.</td></tr>';
+
+      /* Remediation progress */
+      document.getElementById('remediation-progress-block').innerHTML =
+        '<progress class="progress" aria-label="Remediation progress ' + pct + ' percent" value="' + pct + '" max="100">' + pct + '%</progress>' +
+        '<p class="muted" style="font-size:13px;margin-top:8px;">' + pct + '% resolved (' + resolved + ' of ' + total + ' findings fixed or closed).</p>';
+
+      /* Workflow distribution */
+      const statuses = ['draft','triaged','confirmed','fixed','retest','closed'];
+      const wfRows = statuses.map(function(s) {
+        const n = FINDINGS.filter(function(f) { return f.status === s; }).length;
+        if (!n) return '';
+        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;">' +
+          statusBadge(s) + '<strong>' + n + '</strong></div>';
+      }).join('');
+      document.getElementById('workflow-distribution').innerHTML = wfRows || '<p class="muted">No findings.</p>';
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Evidence rendering                                                   */
+    /* ------------------------------------------------------------------ */
+
+    function renderEvidence() {
+      const grid = document.getElementById('evidence-grid');
+      if (!EVIDENCE.length) {
+        grid.innerHTML = '<p class="muted">No evidence items recorded.</p>';
+        return;
+      }
+
+      grid.innerHTML = EVIDENCE.map(function(e) {
+        const finding = FINDINGS.find(function(f) { return f.id === e.findingId; });
+        const findingTitle = finding ? finding.title : e.findingId;
+        const ts = new Date(e.timestamp).toLocaleString('en-GB', {
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+
+        var contentHtml = '';
+        if (e.type === 'screenshot') {
+          contentHtml = [
+            '<div class="screenshot-placeholder" aria-label="Screenshot placeholder for: ' + escapeHtml(e.title) + '">',
+            '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">',
+            '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>',
+            '<polyline points="21 15 16 10 5 21"/>',
+            '</svg>',
+            '<span>' + escapeHtml(e.description) + '</span>',
+            '<span style="font-size:11px;opacity:0.7;">Screenshot captured ' + ts + '</span>',
+            '</div>'
+          ].join('');
+        } else {
+          contentHtml = '<pre class="code-block" tabindex="0" aria-label="Evidence notes">' + escapeHtml(e.notes) + '</pre>';
+        }
+
+        return [
+          '<article class="evidence-card">',
+          '<div class="evidence-card-header">',
+          '<div>',
+          '<p class="evidence-title">' + escapeHtml(e.title) + '</p>',
+          '<p class="evidence-meta">',
+          '<span class="evidence-finding-ref">↗ ' + escapeHtml(e.findingId) + '</span> ',
+          escapeHtml(findingTitle) + ' · ' + ts,
+          '</p>',
+          '</div>',
+          evidenceTypeBadge(e.type),
+          '</div>',
+          contentHtml,
+          e.type === 'screenshot' && e.notes ? [
+            '<p style="font-size:12px;color:var(--muted);margin:10px 0 0;"><strong>Notes:</strong> ' + escapeHtml(e.notes) + '</p>'
+          ].join('') : '',
+          '</article>'
+        ].join('');
+      }).join('');
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Form handling                                                        */
+    /* ------------------------------------------------------------------ */
+
+    function handleFormSubmit(event) {
+      event.preventDefault();
+      const form = event.target;
+
+      const title  = form.title.value.trim();
+      const sev    = form.severity.value;
+      const asset  = form.asset.value.trim();
+      const summary = form.summary.value.trim();
+
+      if (!title || !sev || !asset || !summary) {
+        var first = !title ? form.title : (!sev ? form.severity : (!asset ? form.asset : form.summary));
+        first.focus();
+        first.style.borderColor = 'var(--danger)';
+        setTimeout(function() { first.style.borderColor = ''; }, 2000);
+        return;
+      }
+
+      var newFinding = {
+        id:             nextId(),
+        title:          title,
+        severity:       sev,
+        status:         form.status.value || 'draft',
+        asset:          asset,
+        cwe:            form.cwe.value.trim(),
+        cvss:           form.cvss.value.trim(),
+        summary:        summary,
+        reproSteps:     form.reproSteps.value.trim(),
+        recommendation: form.recommendation.value.trim(),
+        createdAt:      today(),
+        updatedAt:      today(),
+        evidenceIds:    []
+      };
+
+      FINDINGS.push(newFinding);
+      form.reset();
+
+      var success = document.getElementById('form-success');
+      success.style.display = 'block';
+      setTimeout(function() { success.style.display = 'none'; }, 5000);
+
+      renderFindings('all', 'all');
+      resetFilters();
+    }
+
+    function resetForm() {
+      document.getElementById('finding-form').reset();
+      document.getElementById('form-success').style.display = 'none';
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Bootstrap                                                            */
+    /* ------------------------------------------------------------------ */
+
+    document.addEventListener('DOMContentLoaded', function() {
+      renderFindings('all', 'all');
+      renderEvidence();
+    });
+  </script>
+
+</body>
+</html>
