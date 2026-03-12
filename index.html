@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bug Bounty Reporting Workspace</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-alt: #eef3fb;
+      --text: #18212f;
+      --muted: #5d6b82;
+      --border: #d9e2ef;
+      --primary: #2059d6;
+      --primary-soft: #e8f0ff;
+      --success: #157347;
+      --warning: #b86a00;
+      --danger: #b42318;
+      --shadow: 0 18px 40px rgba(24, 33, 47, 0.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      background: radial-gradient(circle at top right, #dae7ff 0%, #eef4ff 28%, #ffffff 72%);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow,
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .eyebrow {
+      background: var(--primary-soft);
+      color: var(--primary);
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      margin: 0 0 12px;
+      font-size: clamp(32px, 5vw, 48px);
+      line-height: 1.05;
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 0 0 24px;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .hero-grid,
+    .metrics,
+    .two-column,
+    .module-grid,
+    .finding-grid,
+    .timeline {
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero-grid {
+      grid-template-columns: 2fr 1fr;
+      align-items: start;
+    }
+
+    .metrics {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 24px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .metric-value {
+      display: block;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+
+    .button-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .button-secondary {
+      background: #fff;
+      border-color: var(--border);
+    }
+
+    h2,
+    h3 {
+      margin-top: 0;
+    }
+
+    section {
+      margin-bottom: 24px;
+    }
+
+    .two-column {
+      grid-template-columns: 1.2fr 0.8fr;
+    }
+
+    .module-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .module-card ul,
+    .finding-grid ul,
+    .timeline ul {
+      margin: 12px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .finding-grid {
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    .table caption {
+      text-align: left;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .table th,
+    .table td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .critical {
+      color: var(--danger);
+      background: #fdecea;
+    }
+
+    .high {
+      color: #9a3412;
+      background: #fff1e8;
+    }
+
+    .medium {
+      color: var(--warning);
+      background: #fff7e6;
+    }
+
+    .new {
+      color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .progress {
+      width: 100%;
+      height: 10px;
+      margin-top: 10px;
+      appearance: none;
+      border: none;
+      background: transparent;
+    }
+
+    .progress::-webkit-progress-bar {
+      background: #e8eef8;
+      border-radius: 999px;
+    }
+
+    .progress::-webkit-progress-value {
+      background: linear-gradient(90deg, #2f6fed 0%, #63a0ff 100%);
+      border-radius: 999px;
+    }
+
+    .progress::-moz-progress-bar {
+      background: linear-gradient(90deg, #2f6fed 0%, #63a0ff 100%);
+      border-radius: 999px;
+    }
+
+    .timeline {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .timeline .card {
+      min-height: 180px;
+    }
+
+    footer {
+      padding: 12px 4px 28px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid,
+      .two-column,
+      .module-grid,
+      .finding-grid,
+      .timeline,
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Authorized security reporting MVP</div>
+          <h1>Bug bounty reporting workspace</h1>
+          <p>
+            This starter implementation turns the repository roadmap into a working first screen for an
+            authorized bug bounty reporting website. It focuses on the MVP flow: define project scope, record
+            findings, attach evidence, and prepare remediation-focused reporting.
+          </p>
+          <div class="cta-row">
+            <a class="button button-primary" href="#workspace">View workspace</a>
+            <a class="button button-secondary" href="#delivery-plan">See delivery plan</a>
+          </div>
+          <span class="muted">Built as a dependency-free static starting point so the project can evolve from a concrete UI.</span>
+        </div>
+        <aside class="card">
+          <h2>Authorized engagement</h2>
+          <p class="muted">
+            Only support in-scope assessments. Keep evidence protected, redact secrets, and make remediation
+            guidance the primary output.
+          </p>
+          <ul>
+            <li>Project scope documented</li>
+            <li>Findings stored in a structured format</li>
+            <li>Evidence tracked with timestamps</li>
+            <li>Reports centered on safe validation and patch guidance</li>
+          </ul>
+        </aside>
+      </div>
+      <div class="metrics">
+        <div class="card">
+          <span class="metric-value">5</span>
+          <span class="muted">Core MVP modules from the roadmap</span>
+        </div>
+        <div class="card">
+          <span class="metric-value">1</span>
+          <span class="muted">End-to-end starter flow on the page</span>
+        </div>
+        <div class="card">
+          <span class="metric-value">4</span>
+          <span class="muted">Delivery phases outlined for follow-up work</span>
+        </div>
+      </div>
+    </header>
+
+    <main id="workspace">
+      <section class="two-column">
+        <article class="card">
+          <h2>Project dashboard</h2>
+          <p class="muted">Track scope, client context, and project progress for an authorized testing engagement.</p>
+          <table class="table" aria-label="Project summary">
+            <caption>Project summary</caption>
+            <tbody>
+              <tr>
+                <th>Project</th>
+                <td>Acme Web App Validation</td>
+              </tr>
+              <tr>
+                <th>Client / Program</th>
+                <td>Acme Internal Bug Bounty</td>
+              </tr>
+              <tr>
+                <th>In-scope assets</th>
+                <td>app.acme.test, api.acme.test</td>
+              </tr>
+              <tr>
+                <th>Out-of-scope assets</th>
+                <td>Production infrastructure, third-party vendors</td>
+              </tr>
+              <tr>
+                <th>Rules of engagement</th>
+                <td>Safe validation only. No destructive testing.</td>
+              </tr>
+              <tr>
+                <th>Status</th>
+                <td><span class="badge new">Active assessment</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+
+        <aside class="card">
+          <h2>Reporting goals</h2>
+          <ul>
+            <li>Capture findings with title, severity, impact, and safe reproduction notes</li>
+            <li>Attach evidence such as screenshots and request or response snippets</li>
+            <li>Generate a report with executive summary and remediation advice</li>
+            <li>Track remediation until retest or resolution</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section>
+        <h2>MVP modules</h2>
+        <div class="module-grid">
+          <article class="card module-card">
+            <div class="chip new">Dashboard</div>
+            <ul>
+              <li>Project name, client, and scope summary</li>
+              <li>In-scope and out-of-scope assets</li>
+              <li>Rules of engagement and overall status</li>
+            </ul>
+          </article>
+          <article class="card module-card">
+            <div class="chip high">Findings manager</div>
+            <ul>
+              <li>Severity, category, affected asset, and summary</li>
+              <li>Business impact and technical details</li>
+              <li>Patch recommendations and references</li>
+            </ul>
+          </article>
+          <article class="card module-card">
+            <div class="chip" style="background:#ebfff2;color:#157347;">Evidence library</div>
+            <ul>
+              <li>Screenshots and timestamps</li>
+              <li>Request and response snippets</li>
+              <li>Affected parameters and ownership notes</li>
+            </ul>
+          </article>
+          <article class="card module-card">
+            <div class="chip" style="background:#f5f0ff;color:#6941c6;">Report generator</div>
+            <ul>
+              <li>Executive summary and risk overview</li>
+              <li>Findings grouped by severity</li>
+              <li>Proof and remediation guidance</li>
+            </ul>
+          </article>
+          <article class="card module-card">
+            <div class="chip" style="background:#fff7e8;color:#a15c07;">Remediation tracker</div>
+            <ul>
+              <li>New, triaged, patch in progress</li>
+              <li>Ready for retest, resolved, accepted risk</li>
+              <li>Status visibility for stakeholders</li>
+            </ul>
+          </article>
+          <article class="card module-card">
+            <div class="chip" style="background:#eef2f6;color:#344054;">Safe reporting</div>
+            <ul>
+              <li>Authorized engagements only</li>
+              <li>Redact secrets from stored data</li>
+              <li>Prioritize remediation-focused communication</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="finding-grid">
+        <article class="card">
+          <h2>Sample findings view</h2>
+          <table class="table" aria-label="Findings list">
+            <caption>Findings list</caption>
+            <thead>
+              <tr>
+                <th>Finding</th>
+                <th>Severity</th>
+                <th>Affected asset</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Stored XSS in profile note renderer</td>
+                <td><span class="badge critical">Critical</span></td>
+                <td>app.acme.test/profile</td>
+                <td><span class="badge new">New</span></td>
+              </tr>
+              <tr>
+                <td>Broken access control on report export</td>
+                <td><span class="badge high">High</span></td>
+                <td>api.acme.test/reports/export</td>
+                <td><span class="badge" style="background:#eef2ff;color:#3730a3;">Triaged</span></td>
+              </tr>
+              <tr>
+                <td>Missing rate limiting on login endpoint</td>
+                <td><span class="badge medium">Medium</span></td>
+                <td>app.acme.test/login</td>
+                <td><span class="badge" style="background:#ecfdf3;color:#027a48;">Patch in progress</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+
+        <aside class="card">
+          <h2>Report preview</h2>
+          <p class="muted">Use the first report view to summarize risk and point directly to remediation.</p>
+          <div>
+            <strong>Executive summary</strong>
+            <p class="muted">Three active findings across two assets, with one critical issue requiring immediate remediation.</p>
+          </div>
+        <div>
+          <strong>Remediation progress</strong>
+          <progress class="progress" aria-label="Remediation progress" value="58" max="100">58%</progress>
+          <p class="muted">58% of current findings are triaged or actively being fixed.</p>
+        </div>
+          <ul>
+            <li>Include validation notes and evidence references</li>
+            <li>Export as a clean HTML report in the next iteration</li>
+            <li>Log access to reports and attached proof</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section id="delivery-plan">
+        <h2>Delivery plan</h2>
+        <div class="timeline">
+          <article class="card">
+            <h3>Week 1</h3>
+            <ul>
+              <li>Choose the stack</li>
+              <li>Design database schema</li>
+              <li>Sketch dashboard and reporting flows</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Week 2</h3>
+            <ul>
+              <li>Add authentication</li>
+              <li>Build project dashboard</li>
+              <li>Create findings list and form</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Week 3</h3>
+            <ul>
+              <li>Support evidence uploads</li>
+              <li>Add report template</li>
+              <li>Generate HTML export</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Week 4</h3>
+            <ul>
+              <li>Add remediation tracker</li>
+              <li>Polish the UI</li>
+              <li>Test the report flow end to end</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      Starter implementation for the bug bounty reporting website roadmap in this repository.
+    </footer>
+  </div>
+</body>
+</html>
