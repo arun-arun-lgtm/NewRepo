@@ -1,187 +1,180 @@
-# Roadmap for an Authorized Bug Bounty Reporting Website
+# Bug Bounty Hunter Platform
 
-This repository now contains a practical roadmap for building a website that helps **authorized** bug bounty hunters and security teams:
+This repository contains a platform designed to help **bug hunters find vulnerabilities in other websites** through authorized bug bounty programs.
 
-- plan and track testing engagements
-- capture findings in a structured way
-- generate remediation-focused reports
-- show evidence of a flaw without providing harmful exploitation guidance
+The platform provides bug hunters with:
 
-## 1. Define the goal clearly
+- a systematic hunting checklist covering common vulnerability categories
+- target program and scope management
+- structured finding capture and evidence collection
+- professional report generation for program submissions
+- remediation tracking until closure
 
-The website should help a user move through this workflow:
+---
 
-1. Create an authorized assessment or bug bounty project
-2. Record findings with severity, impact, affected asset, and proof
-3. Generate a report that explains:
-   - what the flaw is
-   - why it matters
-   - how to reproduce it safely
-   - how to patch or mitigate it
-4. Track remediation status until closure
+## 1. What this platform does
 
-## 2. Start with a minimum viable product
+This is a **bug hunter's toolkit**, not a bug-reporting form for this website. It helps hunters who are participating in bug bounty programs discover security vulnerabilities in target websites — the kind of vulnerabilities that program owners pay hunters to find.
 
-Build the first version around five core modules.
+The workflow a hunter follows using this platform:
 
-### A. Project dashboard
+1. Add the bug bounty program and read its scope
+2. Work through the hunting checklist (XSS, IDOR, SQLi, SSRF, misconfigurations, and more)
+3. Confirm and reproduce a vulnerability on the target website
+4. Log the finding with technical details, impact, and evidence
+5. Generate a clear, structured report to submit to the program
+6. Track the remediation status until the issue is resolved
 
-Use this to manage authorized targets and scope.
+---
 
-Recommended fields:
+## 2. Core modules
 
-- project name
-- client or program name
+### A. Target programs
+
+Track which bug bounty programs you are hunting in.
+
+Fields:
+
+- program name
+- platform or company (e.g. HackerOne, Bugcrowd)
 - scope summary
-- in-scope assets
-- out-of-scope assets
+- in-scope assets (domains and endpoints you can test)
+- out-of-scope assets (what you must not touch)
 - rules of engagement
-- project status
+- hunting status
 
-### B. Findings manager
+### B. Hunting checklist
 
-Each finding should have a structured record.
+A built-in checklist of vulnerability categories to test on target websites:
 
-Suggested fields:
+- Authentication & session issues (brute force, session fixation, JWT flaws)
+- Access control and IDOR (horizontal/vertical privilege escalation)
+- Injection (SQLi, command injection, SSTI, XXE)
+- Cross-site scripting (reflected, stored, DOM-based)
+- Server-side vulnerabilities (SSRF, path traversal, insecure deserialization)
+- Reconnaissance and information disclosure
+- File upload vulnerabilities
+- Business logic flaws
+- Misconfigurations (CORS, security headers, exposed admin panels)
 
-- title
-- category
-- severity
+### C. Findings log
+
+Record each vulnerability discovered in a target website.
+
+Fields:
+
+- title and category
+- severity (Critical / High / Medium / Low / Info)
 - affected URL or asset
-- short summary
-- business impact
-- technical details
-- evidence
+- summary and business impact
+- technical details and root cause
 - safe reproduction steps
-- patch recommendation
-- references
-- status
+- evidence (screenshots, HTTP requests/responses)
+- remediation recommendation
+- references (CVE, OWASP, CWE)
+- lifecycle status
 
-### C. Report generator
+### D. Evidence library
 
-Generate a professional report from saved findings.
+Store proof for each finding:
 
-Include:
+- screenshots of the vulnerability
+- HTTP request and response showing the flaw
+- notes and PoC details
+- timestamps
+- links back to the finding record
+
+### E. Report generator
+
+Generate a professional bug bounty submission from saved findings:
 
 - executive summary
-- risk overview
 - findings by severity
-- proof and screenshots
-- remediation advice
+- full technical details per finding
+- reproduction steps
+- remediation recommendations
 - retest status
 
-### D. Remediation tracker
+### F. Remediation tracker
 
-Allow teams to move findings through stages such as:
+Track each finding from discovery through fix:
 
-- new
-- triaged
-- patch in progress
-- ready for retest
-- resolved
-- accepted risk
+- New / Draft
+- Triaged
+- Confirmed by program
+- Patch in progress
+- Ready for retest
+- Resolved / Closed
+- Accepted risk
 
-### E. Evidence library
+---
 
-Store:
-
-- screenshots
-- request and response snippets
-- affected parameters
-- timestamps
-- asset ownership notes
-
-## 3. Recommended feature roadmap
+## 3. Feature roadmap
 
 ### Phase 1: Foundation
 
-- Simple website with login
-- Project creation form
-- Findings CRUD
-- Severity labels
-- Basic PDF or HTML report export
+- Target program management
+- Hunting checklist with vulnerability categories
+- Findings CRUD with severity and status
+- Evidence upload and linking
+- Basic HTML report export
 
-### Phase 2: Better reporting
+### Phase 2: Better hunting
 
-- Report templates for web, API, and mobile findings
+- Checklist progress tracking per program
+- Custom checklist templates (web, API, mobile)
+- CVSS / severity scoring helper
+- Subdomain and endpoint recon notes
+
+### Phase 3: Reporting
+
+- Report templates for web, API, and mobile programs
 - Reusable remediation recommendations
-- CVSS or internal risk scoring
-- Filters by status, severity, and asset
+- PDF export
+- Program submission format templates (HackerOne, Bugcrowd)
 
-### Phase 3: Collaboration
+### Phase 4: Collaboration
 
+- Multiple hunter workspaces
 - Comments on findings
-- Reviewer approval workflow
-- Client-facing remediation portal
+- Shared evidence per team
 - Audit trail for status changes
 
-### Phase 4: Automation
+---
 
-- Import findings from scanning tools
-- Automatic report section generation from templates
-- Notifications when findings change state
-- Retest queue for resolved issues
+## 4. Page structure
 
-## 4. Suggested page structure
-
-If you want the website to be easy to navigate, use pages like these:
-
-- Home
-- About / Methodology
-- Dashboard
-- Projects
-- Findings
+- Home / Dashboard
+- Target Programs
+- Hunting Checklist
+- Findings Log
+- Evidence Library
 - Reports
 - Remediation Tracker
+- Methodology
 - Settings
 
-## 5. Safe report format
+---
 
-The generated report should focus on remediation and authorized validation.
+## 5. Responsible hunting
 
-Recommended structure:
+This platform supports **authorized bug bounty hunting only**. Every hunt must be:
 
-### Executive summary
+- within the scope defined by the bug bounty program
+- following the program's rules of engagement
+- non-destructive — no actions that damage the target or its users
+- reported responsibly — give the program time to fix before any disclosure
 
-- overall security posture
-- number of findings
-- most important risks
+---
 
-### Finding details
+## 6. Technical stack options
 
-For each finding include:
-
-- title
-- severity
-- affected asset
-- description
-- impact
-- evidence
-- safe reproduction notes
-- patch recommendation
-- validation notes
-
-### Remediation section
-
-Include concrete defensive guidance such as:
-
-- input validation
-- output encoding
-- access control fixes
-- secure configuration changes
-- dependency updates
-- logging and monitoring improvements
-
-## 6. Suggested technical stack
-
-Pick one simple stack and keep the first release small.
-
-### Option A: Frontend + backend
+### Option A: Full-stack web app
 
 - Frontend: React or Next.js
 - Backend: Node.js with Express or Next.js API routes
-- Database: PostgreSQL or SQLite for MVP
-- Auth: session-based auth or a trusted auth provider
+- Database: PostgreSQL or SQLite
+- Auth: session-based or OAuth
 - Export: server-side HTML to PDF
 
 ### Option B: Fast MVP
@@ -189,76 +182,66 @@ Pick one simple stack and keep the first release small.
 - Next.js full stack
 - Prisma ORM
 - SQLite for local development
-- Simple admin dashboard
+- Static export for offline use
 
-## 7. Data model to create first
+---
 
-Design these core entities:
+## 7. Data model
 
-- User
-- Project
-- Asset
-- Finding
-- Evidence
-- Report
-- RemediationUpdate
+Core entities:
 
-Relationships should support:
+- Hunter (user)
+- Program (bug bounty program with scope)
+- Finding (discovered vulnerability)
+- Evidence (proof linked to a finding)
+- Report (collection of findings for submission)
+- RemediationUpdate (status change history)
 
-- one project with many findings
-- one finding with many evidence items
-- one report containing many findings
+Relationships:
+
+- one program has many findings
+- one finding has many evidence items
+- one report contains many findings
+
+---
 
 ## 8. Delivery plan
 
-Use this order to execute the project.
-
 ### Week 1
 
-- define scope
-- choose stack
-- design database schema
-- sketch page wireframes
+- define scope and choose stack
+- design data model
+- build target program management and hunting checklist
 
 ### Week 2
 
-- build authentication
-- build project dashboard
-- build findings form and list view
+- build findings form and log view
+- add severity labels and lifecycle status
+- implement evidence linking
 
 ### Week 3
 
 - add evidence uploads
-- add report template
-- generate HTML export
+- build report template
+- generate HTML export for submission
 
 ### Week 4
 
 - add remediation tracker
-- polish UI
-- test report workflow end to end
+- polish UI and accessibility
+- end-to-end test: program → checklist → finding → report
 
-## 9. Quality and trust requirements
+---
 
-To keep the platform useful and responsible:
+## 9. Best next step
 
-- only support authorized testing engagements
-- clearly separate in-scope and out-of-scope assets
-- protect uploaded evidence
-- redact secrets from stored data
-- log access to reports and evidence
-- make remediation guidance clear and actionable
+To build this properly, start with:
 
-## 10. Best next step
+1. A wireframe for the hunting checklist, findings log, and report pages
+2. A simple data model for programs and findings
+3. One end-to-end flow:
+   - add a program and define scope
+   - work through the checklist on a target
+   - log a finding with evidence
+   - generate and export the report
 
-If you want to execute this idea properly, begin with:
-
-1. a wireframe for the dashboard, findings page, and report page
-2. a small database schema for projects and findings
-3. one end-to-end flow:
-   - create project
-   - add finding
-   - attach evidence
-   - export report
-
-That gives you a working MVP quickly, and you can expand it into a more complete bug bounty reporting platform afterward.

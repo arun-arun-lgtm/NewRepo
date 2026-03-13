@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bug Bounty Reporting Workspace</title>
+  <title>Bug Bounty Hunter Platform</title>
   <style>
     /* === Design tokens === */
     :root {
@@ -691,15 +691,16 @@
 
   <!-- ===== Navigation ===== -->
   <nav class="site-nav" aria-label="Site navigation">
-    <span class="brand">🔍 BBR Workspace</span>
+    <span class="brand">🎯 Bug Bounty Hunter</span>
     <a class="nav-link" href="#dashboard">Dashboard</a>
-    <a class="nav-link" href="#projects">Projects</a>
+    <a class="nav-link" href="#programs">Target Programs</a>
+    <a class="nav-link" href="#checklist">Hunting Checklist</a>
     <a class="nav-link" href="#findings">Findings</a>
-    <a class="nav-link" href="#new-finding">Submit Finding</a>
+    <a class="nav-link" href="#new-finding">Log Finding</a>
     <a class="nav-link" href="#evidence">Evidence</a>
     <a class="nav-link" href="#report">Reports</a>
     <a class="nav-link" href="#remediation">Remediation</a>
-    <a class="nav-link" href="#about">About</a>
+    <a class="nav-link" href="#about">Methodology</a>
     <a class="nav-link" href="#settings">Settings</a>
     <a class="nav-link" href="#delivery-plan">Roadmap</a>
   </nav>
@@ -710,32 +711,31 @@
     <header class="hero">
       <div class="hero-grid">
         <div>
-          <div class="eyebrow">Authorized security reporting framework</div>
-          <h1>Bug bounty reporting workspace</h1>
+          <div class="eyebrow">🎯 Find bugs in other websites — authorized, structured, effective</div>
+          <h1>Bug Bounty Hunter Platform</h1>
           <p>
-            A structured, workflow-driven framework for authorized bug bounty reporting.
-            Capture findings, attach evidence, manage lifecycle states, and generate
-            remediation-focused reports — all in a single dependency-free workspace.
+            A complete toolkit for bug hunters to <strong>discover vulnerabilities in target websites</strong>.
+            Use the hunting checklist to know what to look for, manage your target programs and scope,
+            log confirmed findings, attach evidence, and generate professional reports — all in one place.
           </p>
           <div class="cta-row">
-            <a class="button button-primary" href="#findings">View findings</a>
-            <a class="button button-secondary" href="#new-finding">Submit finding</a>
-            <a class="button button-secondary" href="#report">Report preview</a>
+            <a class="button button-primary" href="#checklist">Start hunting</a>
+            <a class="button button-secondary" href="#programs">My programs</a>
+            <a class="button button-secondary" href="#findings">View findings</a>
           </div>
-          <span class="muted">Dependency-free static implementation. Mock data drives the UI; swap in a real API when ready.</span>
+          <span class="muted">For authorized bug bounty programs only. Always hunt within scope.</span>
         </div>
         <aside class="card">
-          <h2>Engagement at a glance</h2>
-          <p class="muted">Acme Web App Validation — Acme Internal Bug Bounty</p>
+          <h2>Active engagement</h2>
+          <p class="muted">Acme Web App — Acme Bug Bounty Program</p>
           <ul>
-            <li>In-scope: <strong>app.acme.test, api.acme.test</strong></li>
-            <li>Rules: Safe validation only. No destructive testing.</li>
-            <li>Status: <span class="badge new">Active assessment</span></li>
+            <li>Target: <strong>app.acme.test, api.acme.test</strong></li>
+            <li>Scope: Web app + REST API</li>
+            <li>Status: <span class="badge new">Hunting active</span></li>
           </ul>
           <hr style="border:none;border-top:1px solid var(--border);margin:14px 0;">
           <p class="muted" style="font-size:13px;margin:0;">
-            Only authorized engagements. Evidence protected, secrets redacted,
-            remediation guidance is the primary output.
+            Only hunt within your authorized scope. Never test assets outside the program's rules of engagement.
           </p>
         </aside>
       </div>
@@ -764,41 +764,170 @@
       <!-- ===== Dashboard ===== -->
       <section id="dashboard">
         <div class="section-header">
-          <h2>Project dashboard</h2>
+          <h2>Hunter dashboard</h2>
         </div>
         <div class="two-column">
           <article class="card">
-            <p class="muted" style="margin-top:0;">Track scope, rules of engagement, and project context for the active testing engagement.</p>
-            <table class="table" aria-label="Project summary">
-              <caption>Project summary</caption>
+            <p class="muted" style="margin-top:0;">Overview of your active bug bounty program, scope, and hunting progress.</p>
+            <table class="table" aria-label="Active program summary">
+              <caption>Active program summary</caption>
               <tbody>
-                <tr><th scope="row">Project</th><td>Acme Web App Validation</td></tr>
-                <tr><th scope="row">Client / Program</th><td>Acme Internal Bug Bounty</td></tr>
+                <tr><th scope="row">Program</th><td>Acme Bug Bounty</td></tr>
+                <tr><th scope="row">Target website</th><td>app.acme.test, api.acme.test</td></tr>
                 <tr><th scope="row">In-scope assets</th><td>app.acme.test, api.acme.test</td></tr>
                 <tr><th scope="row">Out-of-scope</th><td>Production infrastructure, third-party vendors</td></tr>
-                <tr><th scope="row">Rules of engagement</th><td>Safe validation only. No destructive testing.</td></tr>
-                <tr><th scope="row">Status</th><td><span class="badge new">Active assessment</span></td></tr>
+                <tr><th scope="row">Rules of engagement</th><td>Safe testing only. No destructive actions.</td></tr>
+                <tr><th scope="row">Status</th><td><span class="badge new">Hunting active</span></td></tr>
               </tbody>
             </table>
           </article>
           <aside class="card">
-            <h3>MVP modules</h3>
+            <h3>Hunter toolkit modules</h3>
             <ul style="padding-left:18px;line-height:1.8;color:var(--muted);">
-              <li><strong>Findings manager</strong> — structured capture with severity, CWE, lifecycle</li>
+              <li><strong>Target Programs</strong> — manage authorized programs and scope</li>
+              <li><strong>Hunting Checklist</strong> — what vulnerabilities to look for</li>
+              <li><strong>Findings tracker</strong> — log and track bugs you discover</li>
               <li><strong>Evidence library</strong> — screenshots, request/response, PoC notes</li>
-              <li><strong>Workflow engine</strong> — Draft → Triaged → Confirmed → Fixed → Retest → Closed</li>
-              <li><strong>Report generator</strong> — executive summary, finding details, remediation status</li>
-              <li><strong>Remediation tracker</strong> — progress per finding, overall metrics</li>
+              <li><strong>Report generator</strong> — generate professional submission reports</li>
             </ul>
           </aside>
+        </div>
+      </section>
+
+      <!-- ===== Hunting Checklist ===== -->
+      <section id="checklist">
+        <div class="section-header">
+          <h2>Hunting checklist</h2>
+          <span class="muted" style="font-size:13px;">Systematic checklist of vulnerabilities to test for in target websites</span>
+        </div>
+        <div class="module-grid">
+
+          <article class="card">
+            <h3>🔐 Authentication &amp; Session</h3>
+            <ul style="padding-left:18px;line-height:1.9;color:var(--muted);font-size:13px;">
+              <li>Default or weak credentials</li>
+              <li>Username enumeration on login/registration</li>
+              <li>No rate limiting / brute force protection</li>
+              <li>Password reset link not expiring</li>
+              <li>Session tokens not invalidated on logout</li>
+              <li>Session fixation</li>
+              <li>JWT algorithm confusion (none / RS256→HS256)</li>
+              <li>Missing MFA bypass</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>🚦 Access Control &amp; IDOR</h3>
+            <ul style="padding-left:18px;line-height:1.9;color:var(--muted);font-size:13px;">
+              <li>IDOR — access other users' data by changing IDs</li>
+              <li>Horizontal privilege escalation</li>
+              <li>Vertical privilege escalation (user → admin)</li>
+              <li>Missing authorization on API endpoints</li>
+              <li>Forced browsing to hidden pages</li>
+              <li>Mass assignment / parameter pollution</li>
+              <li>JWT privilege claims manipulation</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>💉 Injection</h3>
+            <ul style="padding-left:18px;line-height:1.9;color:var(--muted);font-size:13px;">
+              <li>SQL injection (GET/POST params, headers, cookies)</li>
+              <li>NoSQL injection</li>
+              <li>OS command injection</li>
+              <li>LDAP / XPath injection</li>
+              <li>Template injection (SSTI)</li>
+              <li>XML / XXE injection</li>
+              <li>CRLF / HTTP header injection</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>🖥️ Cross-Site Scripting (XSS)</h3>
+            <ul style="padding-left:18px;line-height:1.9;color:var(--muted);font-size:13px;">
+              <li>Reflected XSS in query parameters / form fields</li>
+              <li>Stored XSS in user-generated content</li>
+              <li>DOM-based XSS via client-side JavaScript</li>
+              <li>XSS in file name / upload metadata</li>
+              <li>XSS via HTTP response headers</li>
+              <li>Bypassing HTML sanitizers / WAF</li>
+              <li>Content Security Policy misconfiguration</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>🌐 Server-Side Vulnerabilities</h3>
+            <ul style="padding-left:18px;line-height:1.9;color:var(--muted);font-size:13px;">
+              <li>SSRF — make the server fetch internal resources</li>
+              <li>Path traversal / directory traversal</li>
+              <li>File inclusion (LFI / RFI)</li>
+              <li>Insecure deserialization</li>
+              <li>Server-side request forgery via webhooks</li>
+              <li>Race conditions (TOCTOU)</li>
+              <li>Open redirect</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>🔍 Recon &amp; Information Disclosure</h3>
+            <ul style="padding-left:18px;line-height:1.9;color:var(--muted);font-size:13px;">
+              <li>Subdomain enumeration (find forgotten assets)</li>
+              <li>Exposed .git / .env / backup files</li>
+              <li>Verbose error messages / stack traces</li>
+              <li>API documentation exposed (Swagger, Postman)</li>
+              <li>Cloud storage buckets publicly readable</li>
+              <li>Sensitive data in JS source files</li>
+              <li>Google dorking for target-specific leaks</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>📤 File Upload &amp; Download</h3>
+            <ul style="padding-left:18px;line-height:1.9;color:var(--muted);font-size:13px;">
+              <li>Upload executable files (webshell)</li>
+              <li>Bypass content-type / extension checks</li>
+              <li>Stored XSS via SVG / HTML upload</li>
+              <li>XXE via XML / DOCX upload</li>
+              <li>Path traversal in file download</li>
+              <li>SSRF via image URL fetch</li>
+              <li>Zip slip (archive path traversal)</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>🔗 Business Logic</h3>
+            <ul style="padding-left:18px;line-height:1.9;color:var(--muted);font-size:13px;">
+              <li>Price manipulation (negative quantities, coupons)</li>
+              <li>Workflow bypass (skip payment/verification steps)</li>
+              <li>Account takeover via email change</li>
+              <li>Account takeover via OAuth misconfiguration</li>
+              <li>Coupon / referral abuse</li>
+              <li>Multi-step form manipulation</li>
+              <li>Rate limit on sensitive operations (OTP, coupons)</li>
+            </ul>
+          </article>
+
+          <article class="card">
+            <h3>⚙️ Misconfigurations</h3>
+            <ul style="padding-left:18px;line-height:1.9;color:var(--muted);font-size:13px;">
+              <li>CORS misconfiguration (null origin, wildcard)</li>
+              <li>Missing security headers (HSTS, X-Frame-Options, CSP)</li>
+              <li>HTTP methods not restricted (PUT, DELETE, TRACE)</li>
+              <li>Insecure cookies (missing Secure / HttpOnly / SameSite)</li>
+              <li>Admin panels exposed to the internet</li>
+              <li>Outdated / vulnerable software versions</li>
+              <li>Clickjacking via missing X-Frame-Options</li>
+            </ul>
+          </article>
+
         </div>
       </section>
 
       <!-- ===== Findings ===== -->
       <section id="findings">
         <div class="section-header">
-          <h2>Findings</h2>
-          <a class="button button-primary button-sm" href="#new-finding">+ Submit finding</a>
+          <h2>Findings log</h2>
+          <a class="button button-primary button-sm" href="#new-finding">+ Log finding</a>
         </div>
 
         <!-- Workflow state legend -->
@@ -864,15 +993,16 @@
         <div class="finding-detail" id="finding-detail" role="region" aria-label="Finding detail"></div>
       </section>
 
-      <!-- ===== Submit Finding Form ===== -->
+      <!-- ===== Log Finding Form ===== -->
       <section id="new-finding">
         <div class="section-header">
-          <h2>Submit finding</h2>
+          <h2>Log a finding</h2>
         </div>
         <article class="card">
           <p class="muted" style="margin-top:0;">
-            Complete all required fields (<span aria-hidden="true" style="color:var(--danger)">*</span> required).
-            Findings are added to the list above and can be reviewed, updated, and tracked through the full lifecycle.
+            Found a bug in a target website? Log it here. Complete all required fields
+            (<span aria-hidden="true" style="color:var(--danger)">*</span> required).
+            Findings are tracked through the full lifecycle until reported and resolved.
           </p>
           <form id="finding-form" onsubmit="handleFormSubmit(event)" novalidate aria-label="Finding submission form">
             <div class="form-grid">
@@ -997,7 +1127,7 @@
             </div>
 
             <div class="form-success" id="form-success" role="status" aria-live="polite">
-              ✓ Finding saved successfully. <a href="#findings" style="color:inherit;text-decoration:underline;">View in findings list →</a>
+              ✓ Finding logged successfully. <a href="#findings" style="color:inherit;text-decoration:underline;">View in findings log →</a>
             </div>
           </form>
         </article>
@@ -1053,33 +1183,33 @@
         </div>
       </section>
 
-      <!-- ===== Projects ===== -->
-      <section id="projects">
+      <!-- ===== Target Programs ===== -->
+      <section id="programs">
         <div class="section-header">
-          <h2>Projects</h2>
+          <h2>Target programs</h2>
         </div>
         <div class="two-column" style="margin-bottom:24px;">
           <article class="card">
-            <h3 style="margin-top:0;">Create project</h3>
-            <form id="project-form" onsubmit="handleProjectSubmit(event)" novalidate aria-label="Project creation form">
+            <h3 style="margin-top:0;">Add target program</h3>
+            <form id="project-form" onsubmit="handleProjectSubmit(event)" novalidate aria-label="Target program form">
               <div class="form-grid">
 
                 <div class="form-group">
-                  <label class="form-label" for="p-name">Project name <span class="required" aria-label="required">*</span></label>
+                  <label class="form-label" for="p-name">Program name <span class="required" aria-label="required">*</span></label>
                   <input class="form-control" type="text" id="p-name" name="name"
-                    placeholder="e.g. Acme Web App Q2 Assessment" required autocomplete="off">
+                    placeholder="e.g. Acme Bug Bounty Program" required autocomplete="off">
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for="p-client">Client / Program name <span class="required" aria-label="required">*</span></label>
+                  <label class="form-label" for="p-client">Platform / company <span class="required" aria-label="required">*</span></label>
                   <input class="form-control" type="text" id="p-client" name="client"
-                    placeholder="e.g. Acme Bug Bounty" required autocomplete="off">
+                    placeholder="e.g. HackerOne / Acme Corp" required autocomplete="off">
                 </div>
 
                 <div class="form-group full-width">
                   <label class="form-label" for="p-scope-summary">Scope summary</label>
                   <textarea class="form-control" id="p-scope-summary" name="scopeSummary" rows="2"
-                    placeholder="Brief description of what is in scope."></textarea>
+                    placeholder="Brief description of what assets are in scope for this program."></textarea>
                 </div>
 
                 <div class="form-group">
@@ -1097,11 +1227,11 @@
                 <div class="form-group full-width">
                   <label class="form-label" for="p-roe">Rules of engagement</label>
                   <textarea class="form-control" id="p-roe" name="roe" rows="2"
-                    placeholder="e.g. Safe validation only. No destructive testing."></textarea>
+                    placeholder="e.g. Safe testing only. No destructive actions. Rate limits apply."></textarea>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for="p-status">Project status</label>
+                  <label class="form-label" for="p-status">Hunting status</label>
                   <select class="form-control" id="p-status" name="status">
                     <option value="planning">Planning</option>
                     <option value="active" selected>Active</option>
@@ -1113,29 +1243,29 @@
 
               </div>
               <div class="form-actions">
-                <button type="submit" class="button button-primary">Create project</button>
+                <button type="submit" class="button button-primary">Add program</button>
                 <button type="button" class="button button-secondary" onclick="document.getElementById('project-form').reset()">Reset</button>
               </div>
               <div class="form-success" id="project-form-success" role="status" aria-live="polite">
-                ✓ Project created successfully. <a href="#projects" style="color:inherit;text-decoration:underline;">View projects →</a>
+                ✓ Program added. <a href="#programs" style="color:inherit;text-decoration:underline;">View programs →</a>
               </div>
             </form>
           </article>
           <aside class="card">
             <h3 style="margin-top:0;">What to record</h3>
             <ul style="padding-left:18px;line-height:1.9;color:var(--muted);">
-              <li><strong>Project name</strong> — descriptive identifier for the engagement</li>
-              <li><strong>Client / Program</strong> — who authorized the testing</li>
-              <li><strong>Scope summary</strong> — high-level description of coverage</li>
-              <li><strong>In-scope assets</strong> — approved targets</li>
-              <li><strong>Out-of-scope</strong> — explicitly excluded assets</li>
-              <li><strong>Rules of engagement</strong> — constraints and authorizations</li>
-              <li><strong>Status</strong> — lifecycle state of the engagement</li>
+              <li><strong>Program name</strong> — the bug bounty program you are hunting in</li>
+              <li><strong>Platform / company</strong> — where the program is hosted (HackerOne, Bugcrowd, etc.)</li>
+              <li><strong>Scope summary</strong> — quick description of the target</li>
+              <li><strong>In-scope assets</strong> — domains and endpoints you can test</li>
+              <li><strong>Out-of-scope</strong> — assets you must not test</li>
+              <li><strong>Rules of engagement</strong> — what actions are allowed/prohibited</li>
+              <li><strong>Hunting status</strong> — whether you are actively hunting this program</li>
             </ul>
           </aside>
         </div>
         <div class="section-header">
-          <h3 style="margin:0;">Active projects</h3>
+          <h3 style="margin:0;">My programs</h3>
         </div>
         <div class="project-grid" id="project-grid">
           <!-- Rendered by JS -->
@@ -1160,71 +1290,78 @@
       <!-- ===== About / Methodology ===== -->
       <section id="about">
         <div class="section-header">
-          <h2>About &amp; methodology</h2>
+          <h2>Hunting methodology</h2>
         </div>
         <div class="methodology-grid">
           <article class="card">
-            <h3>Mission</h3>
+            <h3>What this platform is for</h3>
             <p class="muted">
-              This workspace supports <strong>authorized</strong> bug bounty hunting and security assessment
-              reporting. The platform helps you move from scope definition through finding capture, evidence
-              collection, report generation, and remediation tracking — in a structured, responsible way.
+              This is a <strong>bug hunter's toolkit</strong> — designed to help you systematically
+              find vulnerabilities in <strong>other websites</strong> through authorized bug bounty programs.
+              It guides you from picking a target program, through recon and testing, to logging findings
+              and submitting professional reports.
             </p>
-            <h3 style="margin-top:20px;">Core principles</h3>
+            <h3 style="margin-top:20px;">Hunter's principles</h3>
             <ul style="padding-left:18px;line-height:1.8;color:var(--muted);">
-              <li>Only support authorized testing engagements</li>
-              <li>Clearly separate in-scope and out-of-scope assets</li>
-              <li>Protect uploaded evidence</li>
-              <li>Redact secrets from stored data</li>
-              <li>Log access to reports and evidence</li>
-              <li>Make remediation guidance clear and actionable</li>
+              <li>Only hunt in programs you are authorized to test</li>
+              <li>Always respect the program's in-scope and out-of-scope rules</li>
+              <li>Never cause damage to the target or its users</li>
+              <li>Document everything — proof matters for valid reports</li>
+              <li>Report responsibly; give the program time to fix before disclosure</li>
+              <li>Focus on impact — severity determines reward and priority</li>
             </ul>
           </article>
           <article class="card">
-            <h3>Testing workflow</h3>
+            <h3>Bug hunting workflow</h3>
             <ol style="padding-left:18px;line-height:1.9;color:var(--muted);">
-              <li>Create an authorized project and define scope</li>
-              <li>Record findings with severity, impact, and proof</li>
-              <li>Attach evidence (screenshots, request/response, notes)</li>
-              <li>Generate a remediation-focused report</li>
-              <li>Track fixes through the remediation lifecycle</li>
-              <li>Retest resolved findings and close the engagement</li>
+              <li>Pick an authorized bug bounty program and read its scope</li>
+              <li>Run reconnaissance on in-scope assets (subdomains, endpoints, tech stack)</li>
+              <li>Work through the hunting checklist for each target</li>
+              <li>Confirm and reproduce any potential vulnerability</li>
+              <li>Capture evidence (screenshots, HTTP requests/responses, PoC)</li>
+              <li>Log the finding with full technical details and impact</li>
+              <li>Generate a clear, reproducible report and submit to the program</li>
+              <li>Track remediation and retest when the fix is deployed</li>
             </ol>
           </article>
           <article class="card">
-            <h3>Finding severity guide</h3>
+            <h3>Severity guide</h3>
             <table class="table" aria-label="Severity guide">
               <tbody>
                 <tr>
                   <td><span class="badge sev-critical">Critical</span></td>
-                  <td style="font-size:13px;color:var(--muted);">Direct, immediate business or data impact — RCE, full account takeover, mass data exposure.</td>
+                  <td style="font-size:13px;color:var(--muted);">Immediate, widespread impact — RCE, full account takeover, mass data exposure.</td>
                 </tr>
                 <tr>
                   <td><span class="badge sev-high">High</span></td>
-                  <td style="font-size:13px;color:var(--muted);">Significant impact with moderate exploitation complexity — IDOR, auth bypass, SQLi.</td>
+                  <td style="font-size:13px;color:var(--muted);">Significant impact — IDOR, auth bypass, SQLi, privilege escalation.</td>
                 </tr>
                 <tr>
                   <td><span class="badge sev-medium">Medium</span></td>
-                  <td style="font-size:13px;color:var(--muted);">Limited scope or high complexity required — stored XSS, CSRF, info disclosure.</td>
+                  <td style="font-size:13px;color:var(--muted);">Limited scope or complex to exploit — stored XSS, CSRF, info disclosure.</td>
                 </tr>
                 <tr>
                   <td><span class="badge sev-low">Low</span></td>
-                  <td style="font-size:13px;color:var(--muted);">Minimal impact, defense-in-depth improvements — verbose errors, missing headers.</td>
+                  <td style="font-size:13px;color:var(--muted);">Minimal impact — verbose errors, missing security headers.</td>
                 </tr>
                 <tr>
                   <td><span class="badge sev-info">Informational</span></td>
-                  <td style="font-size:13px;color:var(--muted);">Observations with no direct exploitability but worth noting for hygiene.</td>
+                  <td style="font-size:13px;color:var(--muted);">No direct exploitability but worth flagging for hygiene.</td>
                 </tr>
               </tbody>
             </table>
           </article>
           <article class="card">
-            <h3>Report format</h3>
-            <p class="muted">Each report focuses on remediation and authorized validation:</p>
+            <h3>Good report structure</h3>
+            <p class="muted">A strong bug bounty submission includes:</p>
             <ul style="padding-left:18px;line-height:1.8;color:var(--muted);">
-              <li><strong>Executive summary</strong> — posture, finding counts, key risks</li>
-              <li><strong>Finding details</strong> — title, severity, asset, description, impact, evidence, reproduction, patch advice, validation notes</li>
-              <li><strong>Remediation section</strong> — input validation, output encoding, access control fixes, secure configuration, dependency updates, logging improvements</li>
+              <li><strong>Clear title</strong> — vulnerability type + affected component</li>
+              <li><strong>Severity + CVSS</strong> — justify the rating</li>
+              <li><strong>Description</strong> — what is the bug and where does it exist</li>
+              <li><strong>Impact</strong> — what can an attacker do with this bug</li>
+              <li><strong>Steps to reproduce</strong> — minimal, numbered, reliable</li>
+              <li><strong>Evidence</strong> — screenshots, HTTP traffic, PoC code</li>
+              <li><strong>Remediation suggestion</strong> — how to fix it</li>
             </ul>
           </article>
         </div>
@@ -1351,7 +1488,7 @@
     </main>
 
     <footer>
-      Bug bounty reporting workspace — authorized assessments only. Evidence protected. Remediation guidance is the primary output.
+      Bug Bounty Hunter Platform — helping hunters find bugs in other websites. Authorized programs only. Hunt within scope.
     </footer>
   </div>
 
@@ -1484,12 +1621,12 @@
     const PROJECTS = [
       {
         id: 'P-001',
-        name: 'Acme Web App Validation',
-        client: 'Acme Internal Bug Bounty',
-        scopeSummary: 'Full black-box assessment of the customer-facing web application and REST API.',
+        name: 'Acme Web App Bug Bounty',
+        client: 'HackerOne / Acme Corp',
+        scopeSummary: 'Full testing of the customer-facing web application and REST API.',
         inScope: 'app.acme.test, api.acme.test',
         outScope: 'Production infrastructure, third-party vendors',
-        roe: 'Safe validation only. No destructive testing.',
+        roe: 'Safe testing only. No destructive actions.',
         status: 'active',
         createdAt: '2026-02-15'
       }
@@ -2033,7 +2170,7 @@
     function renderProjects() {
       const grid = document.getElementById('project-grid');
       if (!PROJECTS.length) {
-        grid.innerHTML = '<p class="muted">No projects yet. Use the form above to create one.</p>';
+        grid.innerHTML = '<p class="muted">No programs yet. Use the form above to add one.</p>';
         return;
       }
       const statusMap = {
