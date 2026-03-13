@@ -264,6 +264,7 @@
     .status-fixed     { color: #027a48; background: #ecfdf3; }
     .status-retest    { color: #6941c6; background: #f5f0ff; }
     .status-closed    { color: #1c1c1e; background: #e5e7eb; }
+    .status-accepted  { color: #6b21a8; background: #f3e8ff; }
 
     /* === Filter bar === */
     .filter-bar {
@@ -600,11 +601,80 @@
       text-align: center;
     }
 
+    /* === Projects === */
+    .project-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .project-card h4 { margin: 0 0 4px; font-size: 15px; }
+    .project-card > p { margin: 0 0 8px; font-size: 13px; color: var(--muted); }
+
+    .project-card dl { margin: 0; font-size: 13px; }
+    .project-card dt {
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-top: 8px;
+    }
+    .project-card dd { margin: 2px 0 0; line-height: 1.5; }
+
+    /* === Remediation Tracker (Kanban) === */
+    .kanban-board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+
+    .kanban-col {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .kanban-col-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .kanban-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    .kanban-card:last-child { margin-bottom: 0; }
+    .kanban-card-title { font-weight: 700; font-size: 14px; margin: 0 0 6px; }
+
+    /* === About / Methodology === */
+    .methodology-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+    /* === Settings === */
+    .settings-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+    .settings-section { margin-bottom: 24px; }
+
+    .settings-section h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
     /* === Responsive === */
     @media (max-width: 900px) {
       .hero-grid, .two-column, .module-grid, .finding-grid,
       .timeline, .metrics, .report-grid, .evidence-grid,
-      .form-grid, .detail-grid {
+      .form-grid, .detail-grid, .kanban-board, .methodology-grid,
+      .settings-grid, .project-grid {
         grid-template-columns: 1fr;
       }
 
@@ -623,10 +693,14 @@
   <nav class="site-nav" aria-label="Site navigation">
     <span class="brand">🔍 BBR Workspace</span>
     <a class="nav-link" href="#dashboard">Dashboard</a>
+    <a class="nav-link" href="#projects">Projects</a>
     <a class="nav-link" href="#findings">Findings</a>
     <a class="nav-link" href="#new-finding">Submit Finding</a>
     <a class="nav-link" href="#evidence">Evidence</a>
-    <a class="nav-link" href="#report">Report</a>
+    <a class="nav-link" href="#report">Reports</a>
+    <a class="nav-link" href="#remediation">Remediation</a>
+    <a class="nav-link" href="#about">About</a>
+    <a class="nav-link" href="#settings">Settings</a>
     <a class="nav-link" href="#delivery-plan">Roadmap</a>
   </nav>
 
@@ -735,6 +809,7 @@
           <div class="workflow-step"><span class="badge status-fixed">Fixed</span></div>
           <div class="workflow-step"><span class="badge status-retest">Retest</span></div>
           <div class="workflow-step"><span class="badge status-closed">Closed</span></div>
+          <div class="workflow-step"><span class="badge status-accepted">Accepted Risk</span></div>
         </div>
 
         <!-- Filter bar -->
@@ -757,6 +832,7 @@
             <option value="fixed">Fixed</option>
             <option value="retest">Retest</option>
             <option value="closed">Closed</option>
+            <option value="accepted">Accepted Risk</option>
           </select>
           <span class="filter-separator"></span>
           <button class="button button-secondary button-sm" onclick="resetFilters()">Clear filters</button>
@@ -836,6 +912,7 @@
                   <option value="fixed">Fixed</option>
                   <option value="retest">Retest</option>
                   <option value="closed">Closed</option>
+                  <option value="accepted">Accepted Risk</option>
                 </select>
               </div>
 
@@ -854,10 +931,41 @@
                   autocomplete="off">
               </div>
 
+              <div class="form-group">
+                <label class="form-label" for="f-category">Category</label>
+                <select class="form-control" id="f-category" name="category">
+                  <option value="">Select category…</option>
+                  <option value="injection">Injection (SQLi, Command, etc.)</option>
+                  <option value="xss">Cross-Site Scripting (XSS)</option>
+                  <option value="broken-auth">Broken Authentication</option>
+                  <option value="access-control">Access Control / IDOR</option>
+                  <option value="security-misconfig">Security Misconfiguration</option>
+                  <option value="sensitive-data">Sensitive Data Exposure</option>
+                  <option value="xxe">XML External Entity (XXE)</option>
+                  <option value="insecure-deserialization">Insecure Deserialization</option>
+                  <option value="components">Vulnerable Components</option>
+                  <option value="ssrf">Server-Side Request Forgery (SSRF)</option>
+                  <option value="logging">Insufficient Logging &amp; Monitoring</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
               <div class="form-group full-width">
                 <label class="form-label" for="f-summary">Summary / description <span class="required" aria-label="required">*</span></label>
                 <textarea class="form-control" id="f-summary" name="summary" rows="3"
                   placeholder="Describe the vulnerability: what it is, where it exists, and the potential impact." required></textarea>
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label" for="f-impact">Business impact</label>
+                <textarea class="form-control" id="f-impact" name="businessImpact" rows="2"
+                  placeholder="Describe the potential business or operational impact of this finding."></textarea>
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label" for="f-technical">Technical details</label>
+                <textarea class="form-control" id="f-technical" name="technicalDetails" rows="3"
+                  placeholder="Provide additional technical context, root cause analysis, or affected code references."></textarea>
               </div>
 
               <div class="form-group full-width">
@@ -871,6 +979,14 @@
                 <label class="form-label" for="f-recommendation">Remediation recommendation</label>
                 <textarea class="form-control" id="f-recommendation" name="recommendation" rows="3"
                   placeholder="Describe the recommended fix or mitigation strategy."></textarea>
+              </div>
+
+              <div class="form-group full-width">
+                <label class="form-label" for="f-refs">References</label>
+                <input class="form-control" type="text" id="f-refs" name="references"
+                  placeholder="e.g. CVE-2024-1234, https://owasp.org/…, CWE-79"
+                  autocomplete="off">
+                <span class="form-hint">CVE identifiers, OWASP references, vendor advisories, or relevant links (comma-separated).</span>
               </div>
 
             </div>
@@ -937,6 +1053,260 @@
         </div>
       </section>
 
+      <!-- ===== Projects ===== -->
+      <section id="projects">
+        <div class="section-header">
+          <h2>Projects</h2>
+        </div>
+        <div class="two-column" style="margin-bottom:24px;">
+          <article class="card">
+            <h3 style="margin-top:0;">Create project</h3>
+            <form id="project-form" onsubmit="handleProjectSubmit(event)" novalidate aria-label="Project creation form">
+              <div class="form-grid">
+
+                <div class="form-group">
+                  <label class="form-label" for="p-name">Project name <span class="required" aria-label="required">*</span></label>
+                  <input class="form-control" type="text" id="p-name" name="name"
+                    placeholder="e.g. Acme Web App Q2 Assessment" required autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="p-client">Client / Program name <span class="required" aria-label="required">*</span></label>
+                  <input class="form-control" type="text" id="p-client" name="client"
+                    placeholder="e.g. Acme Bug Bounty" required autocomplete="off">
+                </div>
+
+                <div class="form-group full-width">
+                  <label class="form-label" for="p-scope-summary">Scope summary</label>
+                  <textarea class="form-control" id="p-scope-summary" name="scopeSummary" rows="2"
+                    placeholder="Brief description of what is in scope."></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="p-in-scope">In-scope assets</label>
+                  <input class="form-control" type="text" id="p-in-scope" name="inScope"
+                    placeholder="e.g. app.example.com, api.example.com" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="p-out-scope">Out-of-scope assets</label>
+                  <input class="form-control" type="text" id="p-out-scope" name="outScope"
+                    placeholder="e.g. Production infra, third-party vendors" autocomplete="off">
+                </div>
+
+                <div class="form-group full-width">
+                  <label class="form-label" for="p-roe">Rules of engagement</label>
+                  <textarea class="form-control" id="p-roe" name="roe" rows="2"
+                    placeholder="e.g. Safe validation only. No destructive testing."></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="p-status">Project status</label>
+                  <select class="form-control" id="p-status" name="status">
+                    <option value="planning">Planning</option>
+                    <option value="active" selected>Active</option>
+                    <option value="paused">Paused</option>
+                    <option value="completed">Completed</option>
+                    <option value="archived">Archived</option>
+                  </select>
+                </div>
+
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="button button-primary">Create project</button>
+                <button type="button" class="button button-secondary" onclick="document.getElementById('project-form').reset()">Reset</button>
+              </div>
+              <div class="form-success" id="project-form-success" role="status" aria-live="polite">
+                ✓ Project created successfully. <a href="#projects" style="color:inherit;text-decoration:underline;">View projects →</a>
+              </div>
+            </form>
+          </article>
+          <aside class="card">
+            <h3 style="margin-top:0;">What to record</h3>
+            <ul style="padding-left:18px;line-height:1.9;color:var(--muted);">
+              <li><strong>Project name</strong> — descriptive identifier for the engagement</li>
+              <li><strong>Client / Program</strong> — who authorized the testing</li>
+              <li><strong>Scope summary</strong> — high-level description of coverage</li>
+              <li><strong>In-scope assets</strong> — approved targets</li>
+              <li><strong>Out-of-scope</strong> — explicitly excluded assets</li>
+              <li><strong>Rules of engagement</strong> — constraints and authorizations</li>
+              <li><strong>Status</strong> — lifecycle state of the engagement</li>
+            </ul>
+          </aside>
+        </div>
+        <div class="section-header">
+          <h3 style="margin:0;">Active projects</h3>
+        </div>
+        <div class="project-grid" id="project-grid">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- ===== Remediation Tracker ===== -->
+      <section id="remediation">
+        <div class="section-header">
+          <h2>Remediation tracker</h2>
+        </div>
+        <p class="muted" style="margin-top:0;margin-bottom:16px;">
+          Track each finding through its remediation lifecycle. Use the status dropdown in the
+          <a href="#findings" style="color:var(--primary);">Findings table</a> to move items between stages.
+          The board updates automatically.
+        </p>
+        <div class="kanban-board" id="kanban-board">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- ===== About / Methodology ===== -->
+      <section id="about">
+        <div class="section-header">
+          <h2>About &amp; methodology</h2>
+        </div>
+        <div class="methodology-grid">
+          <article class="card">
+            <h3>Mission</h3>
+            <p class="muted">
+              This workspace supports <strong>authorized</strong> bug bounty hunting and security assessment
+              reporting. The platform helps you move from scope definition through finding capture, evidence
+              collection, report generation, and remediation tracking — in a structured, responsible way.
+            </p>
+            <h3 style="margin-top:20px;">Core principles</h3>
+            <ul style="padding-left:18px;line-height:1.8;color:var(--muted);">
+              <li>Only support authorized testing engagements</li>
+              <li>Clearly separate in-scope and out-of-scope assets</li>
+              <li>Protect uploaded evidence</li>
+              <li>Redact secrets from stored data</li>
+              <li>Log access to reports and evidence</li>
+              <li>Make remediation guidance clear and actionable</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Testing workflow</h3>
+            <ol style="padding-left:18px;line-height:1.9;color:var(--muted);">
+              <li>Create an authorized project and define scope</li>
+              <li>Record findings with severity, impact, and proof</li>
+              <li>Attach evidence (screenshots, request/response, notes)</li>
+              <li>Generate a remediation-focused report</li>
+              <li>Track fixes through the remediation lifecycle</li>
+              <li>Retest resolved findings and close the engagement</li>
+            </ol>
+          </article>
+          <article class="card">
+            <h3>Finding severity guide</h3>
+            <table class="table" aria-label="Severity guide">
+              <tbody>
+                <tr>
+                  <td><span class="badge sev-critical">Critical</span></td>
+                  <td style="font-size:13px;color:var(--muted);">Direct, immediate business or data impact — RCE, full account takeover, mass data exposure.</td>
+                </tr>
+                <tr>
+                  <td><span class="badge sev-high">High</span></td>
+                  <td style="font-size:13px;color:var(--muted);">Significant impact with moderate exploitation complexity — IDOR, auth bypass, SQLi.</td>
+                </tr>
+                <tr>
+                  <td><span class="badge sev-medium">Medium</span></td>
+                  <td style="font-size:13px;color:var(--muted);">Limited scope or high complexity required — stored XSS, CSRF, info disclosure.</td>
+                </tr>
+                <tr>
+                  <td><span class="badge sev-low">Low</span></td>
+                  <td style="font-size:13px;color:var(--muted);">Minimal impact, defense-in-depth improvements — verbose errors, missing headers.</td>
+                </tr>
+                <tr>
+                  <td><span class="badge sev-info">Informational</span></td>
+                  <td style="font-size:13px;color:var(--muted);">Observations with no direct exploitability but worth noting for hygiene.</td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+          <article class="card">
+            <h3>Report format</h3>
+            <p class="muted">Each report focuses on remediation and authorized validation:</p>
+            <ul style="padding-left:18px;line-height:1.8;color:var(--muted);">
+              <li><strong>Executive summary</strong> — posture, finding counts, key risks</li>
+              <li><strong>Finding details</strong> — title, severity, asset, description, impact, evidence, reproduction, patch advice, validation notes</li>
+              <li><strong>Remediation section</strong> — input validation, output encoding, access control fixes, secure configuration, dependency updates, logging improvements</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <!-- ===== Settings ===== -->
+      <section id="settings">
+        <div class="section-header">
+          <h2>Settings</h2>
+        </div>
+        <div class="settings-grid">
+          <article class="card">
+            <div class="settings-section">
+              <h3>Workspace</h3>
+              <div class="form-group" style="margin-bottom:12px;">
+                <label class="form-label" for="s-workspace-name">Workspace name</label>
+                <input class="form-control" type="text" id="s-workspace-name" value="BBR Workspace" autocomplete="off">
+              </div>
+              <div class="form-group" style="margin-bottom:12px;">
+                <label class="form-label" for="s-org-name">Organisation / team name</label>
+                <input class="form-control" type="text" id="s-org-name" placeholder="e.g. ACME Security Team" autocomplete="off">
+              </div>
+            </div>
+            <div class="settings-section">
+              <h3>Default engagement settings</h3>
+              <div class="form-group" style="margin-bottom:12px;">
+                <label class="form-label" for="s-default-status">Default finding status</label>
+                <select class="form-control" id="s-default-status">
+                  <option value="draft" selected>Draft</option>
+                  <option value="triaged">Triaged</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:12px;">
+                <label class="form-label" for="s-severity-scheme">Severity scheme</label>
+                <select class="form-control" id="s-severity-scheme">
+                  <option value="cvss" selected>CVSS 3.1</option>
+                  <option value="internal">Internal (Critical / High / Medium / Low / Info)</option>
+                  <option value="bugcrowd">Bugcrowd P1–P5</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-actions" style="margin-top:8px;">
+              <button type="button" class="button button-primary" onclick="saveSettings()">Save settings</button>
+            </div>
+            <div class="form-success" id="settings-success" role="status" aria-live="polite">
+              ✓ Settings saved.
+            </div>
+          </article>
+          <article class="card">
+            <div class="settings-section">
+              <h3>Export preferences</h3>
+              <div class="form-group" style="margin-bottom:12px;">
+                <label class="form-label" for="s-export-format">Export format</label>
+                <select class="form-control" id="s-export-format">
+                  <option value="html" selected>HTML (browser print)</option>
+                  <option value="pdf">PDF (server-side, coming soon)</option>
+                  <option value="markdown">Markdown (coming soon)</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:12px;">
+                <label class="form-label" for="s-report-template">Report template</label>
+                <select class="form-control" id="s-report-template">
+                  <option value="standard" selected>Standard (web application)</option>
+                  <option value="api">API security</option>
+                  <option value="mobile">Mobile application</option>
+                  <option value="network">Network / infrastructure</option>
+                </select>
+              </div>
+            </div>
+            <div class="settings-section">
+              <h3>Data and privacy</h3>
+              <ul style="padding-left:18px;line-height:1.8;color:var(--muted);font-size:13px;">
+                <li>All data is stored client-side in this static implementation.</li>
+                <li>No data leaves the browser until a real backend is connected.</li>
+                <li>Evidence files are referenced by metadata; no binary uploads in the MVP.</li>
+                <li>Redact secrets and credentials before saving findings.</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </section>
+
       <!-- ===== Delivery plan ===== -->
       <section id="delivery-plan">
         <div class="section-header">
@@ -1000,12 +1370,16 @@
         title: 'Stored XSS in profile note renderer',
         severity: 'critical',
         status: 'triaged',
+        category: 'xss',
         asset: 'app.acme.test/profile',
         cwe: 'CWE-79',
         cvss: '8.8',
         summary: 'User-controlled input in the profile notes field is rendered as HTML without sanitization, allowing persistent cross-site scripting attacks against any user who views the affected profile.',
+        businessImpact: 'Allows an attacker to steal session cookies and impersonate any user who views the affected profile, leading to account takeover.',
+        technicalDetails: 'The notes field value is written directly into the DOM using innerHTML without sanitization.',
         reproSteps: '1. Log in as any authenticated user.\n2. Navigate to Profile › Notes.\n3. Enter payload: <img src=x onerror=alert(document.cookie)>\n4. Save and reload the page.\n5. Observe the script executes in the viewer\'s session context.',
         recommendation: 'Apply output encoding using a trusted HTML sanitization library (e.g. DOMPurify). Enforce a strict Content Security Policy header that blocks inline script execution.',
+        references: 'CWE-79, OWASP A03:2021, https://owasp.org/Top10/A03_2021-Injection/',
         createdAt: '2026-03-01',
         updatedAt: '2026-03-10',
         evidenceIds: ['E-001', 'E-002']
@@ -1015,12 +1389,16 @@
         title: 'Broken access control on report export',
         severity: 'high',
         status: 'confirmed',
+        category: 'access-control',
         asset: 'api.acme.test/reports/export',
         cwe: 'CWE-285',
         cvss: '7.5',
         summary: 'The report export endpoint does not verify that the requesting user is authorized to access the target report. Any authenticated user can export any report by manipulating the report ID parameter.',
+        businessImpact: 'Any authenticated user can read confidential security reports belonging to other clients, exposing sensitive vulnerability details.',
+        technicalDetails: 'The endpoint checks only for a valid session token, not whether the authenticated user is the owner or a permitted viewer of the requested report.',
         reproSteps: '1. Authenticate as User A and create a private report. Note its ID.\n2. Authenticate as User B.\n3. Request GET /api/reports/{id}/export using User A\'s report ID.\n4. Observe User B receives User A\'s report without authorization.',
         recommendation: 'Implement server-side object-level authorization on the export endpoint. Verify the requesting user owns or holds explicit permission for the requested report before returning data.',
+        references: 'CWE-285, OWASP A01:2021, https://owasp.org/Top10/A01_2021-Broken_Access_Control/',
         createdAt: '2026-03-02',
         updatedAt: '2026-03-09',
         evidenceIds: ['E-003']
@@ -1030,12 +1408,16 @@
         title: 'Missing rate limiting on login endpoint',
         severity: 'medium',
         status: 'fixed',
+        category: 'broken-auth',
         asset: 'app.acme.test/login',
         cwe: 'CWE-307',
         cvss: '5.3',
         summary: 'The authentication endpoint accepts unlimited login attempts with no rate limiting, account lockout, or CAPTCHA mechanism, enabling brute force attacks against user credentials.',
+        businessImpact: 'Enables automated credential stuffing and brute-force attacks that could compromise user accounts at scale.',
+        technicalDetails: 'No IP-based or account-based throttle is applied at the application or API gateway level.',
         reproSteps: '1. Send 500 POST requests to /login with varying password values using an automated tool.\n2. Observe no rate-limit or lockout response is returned for any request.',
         recommendation: 'Implement progressive delays and account lockout after a threshold of failed attempts. Add rate limiting at the API gateway. Consider TOTP-based multi-factor authentication.',
+        references: 'CWE-307, OWASP A07:2021',
         createdAt: '2026-03-03',
         updatedAt: '2026-03-11',
         evidenceIds: ['E-004']
@@ -1045,12 +1427,16 @@
         title: 'IDOR on user profile settings endpoint',
         severity: 'high',
         status: 'retest',
+        category: 'access-control',
         asset: 'api.acme.test/users/{id}/settings',
         cwe: 'CWE-639',
         cvss: '7.1',
         summary: 'The user settings endpoint allows modification of any user\'s settings by changing the user ID in the URL path. Authorization is checked only against authentication, not resource ownership.',
+        businessImpact: 'An attacker can silently alter notification preferences, email addresses, or other settings for any user, enabling account manipulation.',
+        technicalDetails: 'The PATCH handler extracts the user ID from the URL path and performs the update without verifying the caller is the resource owner.',
         reproSteps: '1. Authenticate as User A (ID: 101).\n2. Send PATCH /api/users/102/settings {"email_notifications": false}.\n3. Observe settings for User B (ID: 102) are updated without error.',
         recommendation: 'Enforce object-level authorization on every endpoint. Verify the authenticated user\'s identity matches the resource owner, or that an explicit permission grant exists.',
+        references: 'CWE-639, OWASP A01:2021',
         createdAt: '2026-03-04',
         updatedAt: '2026-03-12',
         evidenceIds: ['E-005']
@@ -1060,12 +1446,16 @@
         title: 'Sensitive data exposed in error messages',
         severity: 'low',
         status: 'closed',
+        category: 'sensitive-data',
         asset: 'api.acme.test',
         cwe: 'CWE-209',
         cvss: '3.1',
         summary: 'Unhandled exceptions expose internal stack traces, database query fragments, and configuration values in API error responses, providing significant reconnaissance information.',
+        businessImpact: 'Leaks internal architecture details that can accelerate targeted attacks against the application.',
+        technicalDetails: 'The production Express error handler is not configured and falls back to the default verbose error output.',
         reproSteps: '1. Send a malformed request to any API endpoint.\n2. Observe the 500 response includes a full stack trace and internal file paths.',
         recommendation: 'Configure production error handlers to return only generic error messages. Log full error details server-side only. Implement a global exception handler.',
+        references: 'CWE-209, OWASP A09:2021',
         createdAt: '2026-03-01',
         updatedAt: '2026-03-08',
         evidenceIds: []
@@ -1075,15 +1465,33 @@
         title: 'Missing HTTPS enforcement on admin panel',
         severity: 'medium',
         status: 'draft',
+        category: 'security-misconfig',
         asset: 'app.acme.test/admin',
         cwe: 'CWE-319',
         cvss: '5.9',
         summary: 'The administrative panel is accessible over plain HTTP in addition to HTTPS. Session tokens transmitted over HTTP are vulnerable to interception via passive network sniffing.',
+        businessImpact: 'Admin credentials or session tokens could be intercepted on any network path between the browser and server.',
+        technicalDetails: 'No HSTS header is set and the web server does not redirect HTTP requests on port 80 to HTTPS.',
         reproSteps: '1. Navigate to http://app.acme.test/admin.\n2. Observe the admin panel loads without redirect to HTTPS.\n3. Capture network traffic to observe session tokens in cleartext.',
         recommendation: 'Enforce HTTPS across all endpoints using HSTS with a long max-age. Configure automatic HTTP-to-HTTPS redirects. Set the Secure flag on all session cookies.',
+        references: 'CWE-319, OWASP A05:2021',
         createdAt: '2026-03-05',
         updatedAt: '2026-03-05',
         evidenceIds: []
+      }
+    ];
+
+    const PROJECTS = [
+      {
+        id: 'P-001',
+        name: 'Acme Web App Validation',
+        client: 'Acme Internal Bug Bounty',
+        scopeSummary: 'Full black-box assessment of the customer-facing web application and REST API.',
+        inScope: 'app.acme.test, api.acme.test',
+        outScope: 'Production infrastructure, third-party vendors',
+        roe: 'Safe validation only. No destructive testing.',
+        status: 'active',
+        createdAt: '2026-02-15'
       }
     ];
 
@@ -1136,6 +1544,30 @@
     ];
 
     /* ------------------------------------------------------------------ */
+    /* Shared constants                                                     */
+    /* ------------------------------------------------------------------ */
+
+    const STATUS_CSS = {
+      draft:     'status-draft',
+      triaged:   'status-triaged',
+      confirmed: 'status-confirmed',
+      fixed:     'status-fixed',
+      retest:    'status-retest',
+      closed:    'status-closed',
+      accepted:  'status-accepted'
+    };
+
+    const STATUS_LABELS = {
+      draft:     'Draft',
+      triaged:   'Triaged',
+      confirmed: 'Confirmed',
+      fixed:     'Fixed',
+      retest:    'Retest',
+      closed:    'Closed',
+      accepted:  'Accepted Risk'
+    };
+
+    /* ------------------------------------------------------------------ */
     /* Utilities                                                            */
     /* ------------------------------------------------------------------ */
 
@@ -1152,16 +1584,8 @@
     }
 
     function statusBadge(status) {
-      const map = {
-        draft:     'status-draft',
-        triaged:   'status-triaged',
-        confirmed: 'status-confirmed',
-        fixed:     'status-fixed',
-        retest:    'status-retest',
-        closed:    'status-closed'
-      };
-      const cls = map[status] || 'status-draft';
-      const label = status.charAt(0).toUpperCase() + status.slice(1);
+      const cls = STATUS_CSS[status] || 'status-draft';
+      const label = STATUS_LABELS[status] || (status.charAt(0).toUpperCase() + status.slice(1));
       return `<span class="badge ${cls}">${label}</span>`;
     }
 
@@ -1234,10 +1658,10 @@
       }
 
       tbody.innerHTML = filtered.map(function(f) {
-        const statuses = ['draft','triaged','confirmed','fixed','retest','closed'];
+        const statuses = ['draft','triaged','confirmed','fixed','retest','closed','accepted'];
         const opts = statuses.map(function(s) {
           return '<option value="' + s + '"' + (f.status === s ? ' selected' : '') + '>' +
-            s.charAt(0).toUpperCase() + s.slice(1) + '</option>';
+            (STATUS_LABELS[s] || (s.charAt(0).toUpperCase() + s.slice(1))) + '</option>';
         }).join('');
 
         return [
@@ -1267,6 +1691,7 @@
       renderSummaryStats(filtered);
       updateMetrics();
       updateReport();
+      renderRemediationTracker();
     }
 
     function renderSummaryStats(filtered) {
@@ -1335,6 +1760,20 @@
         '<p>' + escapeHtml(f.summary) + '</p>',
         '</div>',
 
+        f.businessImpact ? [
+          '<div class="detail-field full">',
+          '<label>Business impact</label>',
+          '<p style="font-size:14px;line-height:1.6;">' + escapeHtml(f.businessImpact) + '</p>',
+          '</div>'
+        ].join('') : '',
+
+        f.technicalDetails ? [
+          '<div class="detail-field full">',
+          '<label>Technical details</label>',
+          '<p style="font-size:14px;line-height:1.6;">' + escapeHtml(f.technicalDetails) + '</p>',
+          '</div>'
+        ].join('') : '',
+
         '<div class="detail-field">',
         '<label>Target asset</label>',
         '<p><code style="font-size:13px;">' + escapeHtml(f.asset) + '</code></p>',
@@ -1358,6 +1797,13 @@
           '<div class="detail-field full">',
           '<label>Remediation recommendation</label>',
           '<p style="font-size:14px;line-height:1.6;">' + escapeHtml(f.recommendation) + '</p>',
+          '</div>'
+        ].join('') : '',
+
+        f.references ? [
+          '<div class="detail-field full">',
+          '<label>References</label>',
+          '<p style="font-size:13px;color:var(--muted);">' + escapeHtml(f.references) + '</p>',
           '</div>'
         ].join('') : '',
 
@@ -1401,8 +1847,8 @@
     function updateMetrics() {
       const total    = FINDINGS.length;
       const critical = FINDINGS.filter(function(f) { return f.severity === 'critical'; }).length;
-      const open     = FINDINGS.filter(function(f) { return !['fixed','closed'].includes(f.status); }).length;
-      const resolved = FINDINGS.filter(function(f) { return ['fixed','closed'].includes(f.status); }).length;
+      const open     = FINDINGS.filter(function(f) { return !['fixed','closed','accepted'].includes(f.status); }).length;
+      const resolved = FINDINGS.filter(function(f) { return ['fixed','closed','accepted'].includes(f.status); }).length;
 
       document.getElementById('metric-total').textContent    = total;
       document.getElementById('metric-critical').textContent = critical;
@@ -1420,7 +1866,8 @@
       const high     = FINDINGS.filter(function(f) { return f.severity === 'high'; }).length;
       const fixed    = FINDINGS.filter(function(f) { return f.status === 'fixed'; }).length;
       const closed   = FINDINGS.filter(function(f) { return f.status === 'closed'; }).length;
-      const resolved = fixed + closed;
+      const accepted = FINDINGS.filter(function(f) { return f.status === 'accepted'; }).length;
+      const resolved = fixed + closed + accepted;
       const pct      = total ? Math.round((resolved / total) * 100) : 0;
 
       /* Executive summary text */
@@ -1441,7 +1888,7 @@
       ].map(function(pair) {
         const all    = FINDINGS.filter(function(f) { return f.severity === pair[0]; });
         if (!all.length) return '';
-        const openN  = all.filter(function(f) { return !['fixed','closed'].includes(f.status); }).length;
+        const openN  = all.filter(function(f) { return !['fixed','closed','accepted'].includes(f.status); }).length;
         const resN   = all.length - openN;
         return '<tr><td>' + severityBadge(pair[0]) + '</td>' +
           '<td>' + all.length + '</td>' +
@@ -1456,7 +1903,7 @@
         '<p class="muted" style="font-size:13px;margin-top:8px;">' + pct + '% resolved (' + resolved + ' of ' + total + ' findings fixed or closed).</p>';
 
       /* Workflow distribution */
-      const statuses = ['draft','triaged','confirmed','fixed','retest','closed'];
+      const statuses = ['draft','triaged','confirmed','fixed','retest','closed','accepted'];
       const wfRows = statuses.map(function(s) {
         const n = FINDINGS.filter(function(f) { return f.status === s; }).length;
         if (!n) return '';
@@ -1544,19 +1991,23 @@
       }
 
       const newFinding = {
-        id:             nextId(),
-        title:          title,
-        severity:       sev,
-        status:         form.status.value || 'draft',
-        asset:          asset,
-        cwe:            form.cwe.value.trim(),
-        cvss:           form.cvss.value.trim(),
-        summary:        summary,
-        reproSteps:     form.reproSteps.value.trim(),
-        recommendation: form.recommendation.value.trim(),
-        createdAt:      today(),
-        updatedAt:      today(),
-        evidenceIds:    []
+        id:              nextId(),
+        title:           title,
+        severity:        sev,
+        status:          form.status.value || 'draft',
+        category:        form.category.value,
+        asset:           asset,
+        cwe:             form.cwe.value.trim(),
+        cvss:            form.cvss.value.trim(),
+        summary:         summary,
+        businessImpact:  form.businessImpact.value.trim(),
+        technicalDetails: form.technicalDetails.value.trim(),
+        reproSteps:      form.reproSteps.value.trim(),
+        recommendation:  form.recommendation.value.trim(),
+        references:      form.references.value.trim(),
+        createdAt:       today(),
+        updatedAt:       today(),
+        evidenceIds:     []
       };
 
       FINDINGS.push(newFinding);
@@ -1576,12 +2027,136 @@
     }
 
     /* ------------------------------------------------------------------ */
+    /* Projects                                                             */
+    /* ------------------------------------------------------------------ */
+
+    function renderProjects() {
+      const grid = document.getElementById('project-grid');
+      if (!PROJECTS.length) {
+        grid.innerHTML = '<p class="muted">No projects yet. Use the form above to create one.</p>';
+        return;
+      }
+      const statusMap = {
+        planning:  ['badge', 'status-draft',     'Planning'],
+        active:    ['badge', 'new',               'Active'],
+        paused:    ['badge', 'status-triaged',    'Paused'],
+        completed: ['badge', 'status-fixed',      'Completed'],
+        archived:  ['badge', 'status-closed',     'Archived']
+      };
+      grid.innerHTML = PROJECTS.map(function(p) {
+        const [cls, mod, label] = statusMap[p.status] || ['badge', 'status-draft', p.status];
+        return [
+          '<article class="project-card">',
+          '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">',
+          '<h4>' + escapeHtml(p.name) + '</h4>',
+          '<span class="' + cls + ' ' + mod + '">' + label + '</span>',
+          '</div>',
+          '<p>' + escapeHtml(p.client) + '</p>',
+          '<dl>',
+          p.scopeSummary ? '<dt>Scope</dt><dd>' + escapeHtml(p.scopeSummary) + '</dd>' : '',
+          '<dt>In-scope</dt><dd><code style="font-size:12px;">' + escapeHtml(p.inScope || '—') + '</code></dd>',
+          '<dt>Out-of-scope</dt><dd>' + escapeHtml(p.outScope || '—') + '</dd>',
+          p.roe ? '<dt>Rules of engagement</dt><dd>' + escapeHtml(p.roe) + '</dd>' : '',
+          '</dl>',
+          '<p style="font-size:12px;color:var(--muted);margin-top:10px;margin-bottom:0;">Created: ' + escapeHtml(p.createdAt) + '</p>',
+          '</article>'
+        ].join('');
+      }).join('');
+    }
+
+    function handleProjectSubmit(event) {
+      event.preventDefault();
+      const form = event.target;
+      const name   = form.name.value.trim();
+      const client = form.client.value.trim();
+      if (!name || !client) {
+        const first = !name ? form.name : form.client;
+        first.focus();
+        first.style.borderColor = 'var(--danger)';
+        setTimeout(function() { first.style.borderColor = ''; }, 2000);
+        return;
+      }
+      const ids = PROJECTS.map(function(p) { return parseInt(p.id.replace('P-', ''), 10); });
+      const newId = 'P-' + String(Math.max(0, ...ids) + 1).padStart(3, '0');
+      PROJECTS.push({
+        id:           newId,
+        name:         name,
+        client:       client,
+        scopeSummary: form.scopeSummary.value.trim(),
+        inScope:      form.inScope.value.trim(),
+        outScope:     form.outScope.value.trim(),
+        roe:          form.roe.value.trim(),
+        status:       form.status.value || 'active',
+        createdAt:    today()
+      });
+      form.reset();
+      const success = document.getElementById('project-form-success');
+      success.style.display = 'block';
+      setTimeout(function() { success.style.display = 'none'; }, 5000);
+      renderProjects();
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Remediation Tracker                                                  */
+    /* ------------------------------------------------------------------ */
+
+    function renderRemediationTracker() {
+      const board = document.getElementById('kanban-board');
+      if (!board) return;
+      const stages = [
+        { key: 'draft',     label: 'New / Draft',          cls: 'status-draft' },
+        { key: 'triaged',   label: 'Triaged',               cls: 'status-triaged' },
+        { key: 'confirmed', label: 'Patch in Progress',     cls: 'status-confirmed' },
+        { key: 'fixed',     label: 'Ready for Retest',      cls: 'status-fixed' },
+        { key: 'retest',    label: 'In Retest',             cls: 'status-retest' },
+        { key: 'closed',    label: 'Resolved / Closed',     cls: 'status-closed' },
+        { key: 'accepted',  label: 'Accepted Risk',         cls: 'status-accepted' }
+      ];
+      board.innerHTML = stages.map(function(stage) {
+        const cards = FINDINGS.filter(function(f) { return f.status === stage.key; });
+        const cardsHtml = cards.length ? cards.map(function(f) {
+          return [
+            '<div class="kanban-card">',
+            '<p class="kanban-card-title">' + escapeHtml(f.title) + '</p>',
+            '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">',
+            severityBadge(f.severity),
+            '<code style="font-size:11px;background:#eef2f6;padding:2px 6px;border-radius:5px;">' + escapeHtml(f.id) + '</code>',
+            '</div>',
+            '<p style="font-size:12px;color:var(--muted);margin:0;">' + escapeHtml(f.asset) + '</p>',
+            '</div>'
+          ].join('');
+        }).join('') : '<p style="font-size:13px;color:var(--muted);text-align:center;padding:12px 0;margin:0;">No findings</p>';
+        return [
+          '<div class="kanban-col">',
+          '<div class="kanban-col-header">',
+          '<span class="badge ' + stage.cls + '">' + stage.label + '</span>',
+          '<span style="font-size:11px;color:var(--muted);">(' + cards.length + ')</span>',
+          '</div>',
+          cardsHtml,
+          '</div>'
+        ].join('');
+      }).join('');
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Settings                                                             */
+    /* ------------------------------------------------------------------ */
+
+    function saveSettings() {
+      const success = document.getElementById('settings-success');
+      success.style.display = 'block';
+      setTimeout(function() { success.style.display = 'none'; }, 3000);
+    }
+
+    /* ------------------------------------------------------------------ */
     /* Bootstrap                                                            */
     /* ------------------------------------------------------------------ */
 
     document.addEventListener('DOMContentLoaded', function() {
       renderFindings('all', 'all');
       renderEvidence();
+      renderProjects();
+      renderRemediationTracker();
     });
   </script>
 
